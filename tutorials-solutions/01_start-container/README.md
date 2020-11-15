@@ -9,7 +9,7 @@
 (A) Simple
 
 ```bash
-docker run --name my-etherpad-container docker.io/etherpad/etherpad:stable
+docker run -p 9001 --name my-etherpad-container docker.io/etherpad/etherpad:stable
 ```
 
 (B) Complex
@@ -38,11 +38,11 @@ docker run \
     --interactive \
     --tty \
     --rm \
-    amazon/aws-cli \
+    docker.io/amazon/aws-cli \
     sts get-caller-identity
 ```
 
-(A) Verify credentials
+(B) Create a bucket
 
 ```bash
 docker run \
@@ -50,7 +50,7 @@ docker run \
     --interactive \
     --tty \
     --rm \
-    amazon/aws-cli \
+    docker.io/amazon/aws-cli \
     s3api create-bucket --bucket my-globally-unique-bucket-name
 ```
 
