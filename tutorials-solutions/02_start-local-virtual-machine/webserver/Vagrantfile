@@ -1,0 +1,35 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+
+DIR = File.dirname(__FILE__)
+
+GUEST_USERNAME = 'vagrant'
+
+
+Vagrant.configure("2") do |instance|
+
+    instance.vm.box = 'ubuntu/focal64'
+    instance.vm.box_version = '20201112.1.0'
+
+    instance.vm.provider "virtualbox" do |vb|
+        vb.name = 'my-box-id'
+        vb.gui = false
+        vb.cpus = 1
+        vb.memory = "1024"
+
+        vb.check_guest_additions = true
+    end
+
+    instance.vm.synced_folder "#{ DIR }", '/vagrant', disabled: true
+    instance.vm.synced_folder "#{ DIR }/../../","/home/#{ GUEST_USERNAME }/devops-code"
+
+    instance.vm.network "forwarded_port", guest: 80, host: 8080
+
+    instance.vm.provision "shell",
+                          privileged: true,
+                          inline: <<-SHELL
+                              apt update
+                              apt install -y nginx
+                          SHELL
+end
