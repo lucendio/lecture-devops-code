@@ -8,7 +8,7 @@
 
 ```bash
 mkdir -p my-virtual-machine && cd "${_}"
-vagrant init generic/fedora28 && vagrant up --provider virtualbox
+vagrant init ubuntu/focal64 && vagrant up --provider virtualbox
 ```
 
 __NOTE:__ This way, the image that was chosen is implicitly downloaded, in case it is not already available
