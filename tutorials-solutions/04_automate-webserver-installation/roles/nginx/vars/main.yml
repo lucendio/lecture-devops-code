@@ -1,0 +1,3 @@
+nginx_user: 'www-data'
+nginx_group: 'www-data'
+nginx_conf_path: '/etc/nginx/conf.d'

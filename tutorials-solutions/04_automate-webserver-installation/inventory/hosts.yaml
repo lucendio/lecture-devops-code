@@ -1,0 +1,5 @@
+all:
+  hosts:
+    instance1:
+      ansible_host: '10.0.42.23'
+  vars: {}
