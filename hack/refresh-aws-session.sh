@@ -245,7 +245,7 @@ if echo "${response}" | grep -q '<script>window.location'; then
             "${forwardURL}" \
     )
     returnCode=$?
-    (${DEBUG_ENABLED} && echo "${response}" > 06_accessProverForward.log.html)
+    (${VERBOSE_ENABLED} && echo "${response}" > 06_accessProverForward.log.html)
 
 elif echo "${response}" | grep -q 'Access denied:SSO token expired'; then
     echo " [ERROR] AWS account session expired. Abort!" >&2

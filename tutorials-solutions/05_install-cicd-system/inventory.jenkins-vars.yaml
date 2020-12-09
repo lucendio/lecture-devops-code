@@ -1,0 +1,16 @@
+all:
+  vars:
+    jenkins_version: '2.270'
+    jenkins_hostname: 'jenkins.vagrant.local'
+    jenkins_http_port: '8080'
+
+    # IMPORTANT: For demonstration purposes only! Don't! Instead
+    #            use Ansible Vault or Sops for example.
+    jenkins_admin_username: 'operator'
+    jenkins_admin_password: 'pw'
+
+    jenkins_java_options: '-Djenkins.install.runSetupWizard=false'
+
+    # jenkins_plugins:
+    #   - name: 'configuration-as-code'
+    #     version: '1.46'

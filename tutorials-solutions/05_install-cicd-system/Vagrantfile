@@ -1,0 +1,56 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+
+DIR = File.dirname(__FILE__)
+DOMAIN = 'vagrant.local'
+
+
+Vagrant.configure("2") do |instance|
+
+    if Vagrant.has_plugin?( "vagrant-hostmanager" )
+        instance.hostmanager.enabled = true
+        instance.hostmanager.manage_host = true
+        instance.hostmanager.manage_guest = true
+        instance.hostmanager.ignore_private_ip = false
+    else
+        raise "Vagrant Plugin 'HostManager' is required"
+    end
+
+
+    instance.vm.box = 'ubuntu/focal64'
+
+    instance.vm.provider "virtualbox" do |vb|
+        vb.name = 'my-cicd'
+        vb.gui = false
+        vb.cpus = 2
+        vb.memory = "2048"
+    end
+
+    instance.vm.synced_folder "#{ DIR }", '/vagrant', disabled: true
+
+    # NOTE: the Host-Manager plugin is required for this to have an effect
+    instance.vm.hostname = "jenkins.#{ DOMAIN }"
+
+    instance.vm.network 'private_network',
+                        ip: "10.0.23.42",
+                        :adapter => 2
+
+
+    # INFO: make sure Ansible requirements are met
+    instance.vm.provision "shell",
+                          privileged: true,
+                          inline: <<-SHELL
+                              apt update
+                              apt install -y \
+                                  python3 \
+                                  python3-pip
+                          SHELL
+
+    instance.vm.provision "ansible",
+                          playbook: './playbook.yaml',
+                          config_file: './ansible.cfg',
+                          raw_arguments: [
+                              "--inventory=./inventory.jenkins-vars.yaml"
+                          ]
+end

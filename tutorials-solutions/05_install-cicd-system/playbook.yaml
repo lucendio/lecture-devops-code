@@ -1,0 +1,15 @@
+- hosts: all
+  tasks:
+    - name: "Updating package cache"
+      apt:
+        update_cache: 'yes'
+
+    - name: "Installing dependencies"
+      package:
+        name:
+          - openjdk-11-jdk
+        state: present
+
+    - name: "Installing jenkins"
+      import_role:
+        name: 'jenkins'

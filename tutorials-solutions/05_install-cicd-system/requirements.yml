@@ -1,0 +1,6 @@
+roles:
+  - name: jenkins
+    version: 4.3.0
+    src: https://github.com/geerlingguy/ansible-role-jenkins.git
+
+collections: []

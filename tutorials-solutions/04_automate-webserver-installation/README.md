@@ -35,3 +35,6 @@ vagrant up
 ```bash
 ansible-playbook -i ./inventory ./playbook.yml
 ```
+
+__NOTE:__ In case you want to let Vagrant take care of the inventory, you may want to [invoke Ansible
+directly from Vagrant](https://www.vagrantup.com/docs/provisioning/ansible)
