@@ -56,6 +56,19 @@ function extractHiddenInputValue(){
     echo ${result}
 }
 
+function extractFullFormId(){
+    local stringIn=$1
+    local formIdPart=$2
+    local result=$( \
+        echo "${stringIn}" \
+        | xmllint \
+            --xpath "string(//script[contains(@id,'${formIdPart}')]/@id)" \
+            --html \
+            - 2>/dev/null \
+    )
+    echo ${result}
+}
+
 
 function obtainAWSCredentials() {
     local -r key=$1
@@ -113,6 +126,11 @@ if [[ -z "${viewState}" ]] || [[ -z "${viewState}" ]] || [[ -z "${viewState}" ]]
     echo " [ERROR] ViewState variables are empty" >&2
     exit 1
 fi
+formId=$(extractFullFormId "${response}" 'loginPage:siteLogin:loginComponent:loginForm:j_')
+if [[ -z "${formId}" ]]; then
+    echo " [ERROR] formId variable is empty" >&2
+    exit 1
+fi
 
 (${DEBUG_ENABLED} && echo " [DEBUG] Signing in to AVS Educate" >&2)
 response=$( \
@@ -121,7 +139,8 @@ response=$( \
         --request POST \
         \
         --data-urlencode 'AJAXREQUEST=_viewRoot' \
-        --data-urlencode 'loginPage:siteLogin:loginComponent:loginForm:j_id10=loginPage:siteLogin:loginComponent:loginForm:j_id10' \
+        \
+        --data-urlencode "${formId}=${formId}" \
         \
         --data-urlencode 'loginPage:siteLogin:loginComponent:loginForm=loginPage:siteLogin:loginComponent:loginForm' \
         --data-urlencode "loginPage:siteLogin:loginComponent:loginForm:username=${user}" \
