@@ -37,7 +37,7 @@ terraform output 'instanceIPv4'
 #### 3. Connect to the machine via SSH
 
 ```bash
-ssh -i ./.ssh/operator -l ubuntu $(terraform output 'instanceIPv4')
+ssh -i ./.ssh/operator -l ubuntu $(terraform output -raw 'instanceIPv4')
 ```
 
 __NOTE:__ Depending on what kind of image the provider supplies or has been chosen, the username may vary
