@@ -1,0 +1,41 @@
+[Unit]
+Description=Running containerized service: {{ service_name }}
+
+Wants=network.target
+After=network-online.target
+
+
+[Service]
+TimeoutStartSec=0
+Restart=always
+
+StateDirectory={{ service_name }}
+
+ExecStartPre/usr/bin/podman pull --quiet {{ image_registry }}/{{ image_repository }}:{{ image_tag }}
+ExecStart=/usr/bin/podman run \
+            --name {{ instance_name }} \
+            \
+            --publish "{{ instance_port }}:3000" \
+            \
+            --env "CMD_PORT=3000" \
+            --env "CMD_DB_URL=postgres://{{ postgres_user }}:{{ postgres_password }}@{{ postgres_host }}:{{ postgres_port }}/{{ postgres_db }}" \
+            --env "CMD_USECDN=false" \
+            --env "CMD_ALLOW_ANONYMOUS=true" \
+            --env "CMD_ALLOW_ANONYMOUS_VIEWS=true" \
+            --env "CMD_ALLOW_ANONYMOUS_EDITS=true" \
+            --env "CMD_DEFAULT_PERMISSION=freely" \
+            --env "CMD_DOMAIN={{ fqdn }}" \
+            \
+            --volume /var/lib/{{ service_name }}:/home/hackmd/app/public/uploads:rw \
+            \
+            --memory 256Mi \
+            --cpu-shares 256 \
+            \
+            {{ image_registry }}/{{ image_repository }}:{{ image_tag }}
+
+ExecStop=/usr/bin/podman stop --ignore --time 10 {{ instance_name }}
+ExecStopPost=/usr/bin/podman rm --ignore --force {{ instance_name }}
+
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,48 @@
+- hosts: instance_group
+  gather_facts: yes
+  tasks:
+    - import_tasks: './tasks/install-podman.yaml'
+
+    - name: 'Configuring CodiMD instances'
+      template:
+        src: 'codimd.unit.j2'
+        dest: "/etc/systemd/system/codimd-{{ item.name }}.service"
+        owner: 'root'
+        group: 'root'
+        mode: '644'
+      vars:
+        service_name: 'codimd'
+        instance_name: "codimd-{{ item.name }}"
+        instance_port: "{{ item.port }}"
+        image_registry: 'docker.io'
+        image_repository: 'hackmdio/hackmd'
+        image_tag: "{{ version | default('latest') }}"
+        postgres_host: "{{ ansible_default_ipv4.address | default(ansible_all_ipv4_addresses[0]) }}"
+      loop: "{{ instances }}"
+      register: units_codimd
+
+    - name: '(Re)Starting CodiMD instances'
+      systemd:
+        name: "codimd-{{ item.item.name }}"
+        enabled: yes
+        state: "{{ 'restarted' if units_codimd.changed is defined and units_codimd.changed else 'started' }}"
+        daemon_reload: "{{ 'yes' if units_codimd.changed is defined and units_codimd.changed else 'no' }}"
+      loop: "{{ units_codimd.results }}"
+      # NOTE: roll out sequentially
+      # DOCS: https://docs.ansible.com/ansible/latest/user_guide/playbooks_strategies.html
+      throttle: 1
+
+
+    - name: 'Removing CodiMD instance configuration if disabled'
+      file:
+        path: "/etc/systemd/system/codimd-{{ item.name }}.service"
+        state: absent
+      loop: "{{ instances | selectattr('enabled', 'false') | list }}"
+
+    - name: 'Stopping CodiMD instances'
+      systemd:
+        name: "codimd-{{ item.name }}"
+        enabled: no
+        state: 'stopped'
+        daemon_reload: 'yes'
+      loop: "{{ instances | selectattr('enabled', 'false') | list }}"

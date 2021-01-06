@@ -1,0 +1,5 @@
+- name: 'Reloading Nginx'
+  service:
+    name: nginx
+    enabled: yes
+    state: reloaded

@@ -1,0 +1,61 @@
+# Based on https://hackmd.io/c/codimd-documentation/%2F%40codimd%2Fweb-server-nginx
+
+upstream @codimd {
+    {% for port in instance_ports -%}
+    server 127.0.0.1:{{ port }};
+    {% endfor -%}
+
+    # (A) based on client IP
+    # ip_hash;
+
+    # (B) based on existing cookies set by backend
+    hash $connect_sid_cookie consistent;
+
+    keepalive 300;
+}
+
+# REASON: https://stackoverflow.com/questions/25032276/how-use-nginx-variable-cookie-with-point-cookie-like-foo-bar
+map $http_cookie $connect_sid_cookie {
+    default "";
+    "~connect\.sid=(?<connect_sid>[^;]+)" $connect_sid;
+}
+
+map $http_upgrade $connection_upgrade {
+    default upgrade;
+    ''      close;
+}
+
+server {
+
+    listen 80;
+    listen [::]:80;
+
+    server_name {{ fqdn | default('""') }};
+
+    location / {
+        proxy_http_version 1.1;
+
+        # set header for proxy protocol
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection $connection_upgrade;
+
+        # setup for image upload
+        client_max_body_size 8192m;
+
+        # adjust proxy buffer setting
+        proxy_buffers 8 32k;
+        proxy_buffer_size 32k;
+        proxy_busy_buffers_size 64k;
+
+        proxy_max_temp_file_size 8192m;
+
+        proxy_read_timeout 300;
+        proxy_connect_timeout 300;
+        proxy_pass http://@codimd;
+    }
+
+}

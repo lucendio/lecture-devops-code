@@ -1,0 +1,23 @@
+instance_group:
+  hosts:
+    vm: {}
+  vars:
+    fqdn: 'pad.vagrant.local'
+    version: '2.3.2'
+    instances:
+      - name: 'a'
+        port: '8080'
+      - name: 'b'
+        port: '8081'
+      - name: 'c'
+        port: '8082'
+        # To destroy an instance, set
+        # enabled: false
+
+    nginx_conf_path: '/etc/nginx/conf.d'
+
+    postgres_service_name: 'postgres'
+    postgres_user: 'my-db-user'
+    postgres_password: 'my-db-pw'
+    postgres_db: 'my-db-name'
+    postgres_port: '5432'

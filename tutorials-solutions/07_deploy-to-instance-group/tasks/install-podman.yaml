@@ -1,0 +1,25 @@
+- name: Installing Podman package repository
+  when: ansible_distribution == 'Ubuntu'
+  block:
+    - set_fact:
+        ubuntu_major: "{{ ansible_distribution_version.split('.') | first }}"
+        ubuntu_minor: "{{ ansible_distribution_version.split('.') | last }}"
+
+    - name: Installing key for Podman's apt repository
+      apt_key:
+        url: "https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/xUbuntu_{{ ansible_distribution_version }}/Release.key"
+        state: present
+      when: ubuntu_major <= '20' and ubuntu_minor < '10'
+
+    - name: Installing Podman's apt repositpry
+      apt_repository:
+        repo: "deb https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/xUbuntu_{{ ansible_distribution_version }}/ /"
+        filename: 'devel:kubic:libcontainers:stable'
+        state: present
+      when: ubuntu_major <= '20' and ubuntu_minor < '10'
+
+- name: 'Installing Podman'
+  package:
+    name:
+      - podman
+    state: present

@@ -1,0 +1,22 @@
+- import_tasks: './install-podman.yaml'
+
+- name: 'Configuring postgres service'
+  template:
+    src: 'postgres.unit.j2'
+    dest: "/etc/systemd/system/{{ postgres_service_name }}.service"
+    owner: 'root'
+    group: 'root'
+    mode: '644'
+  vars:
+    service_name: "{{ postgres_service_name }}"
+    image_registry: 'docker.io'
+    image_repository: 'library/postgres'
+    image_tag: '13.1'
+  register: unit_postgres
+
+- name: '(Re)Starting postgres'
+  systemd:
+    name: 'postgres'
+    enabled: yes
+    state: "{{ 'restarted' if unit_postgres is defined and unit_postgres.changed else 'started' }}"
+    daemon_reload: "{{ 'yes' if unit_postgres is defined and unit_postgres.changed else 'no' }}"

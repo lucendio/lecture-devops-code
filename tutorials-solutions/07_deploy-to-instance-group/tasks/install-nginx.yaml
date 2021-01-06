@@ -1,0 +1,31 @@
+- name: 'Installing Nginx'
+  package:
+    name:
+      - nginx
+    state: present
+
+- name: 'Disabling default vhost'
+  file:
+    state: absent
+    path: '/etc/nginx/sites-enabled/default'
+  notify:
+    - 'Reloading Nginx'
+
+- name: 'Configuring custom vhost'
+  template:
+    src: 'vhost.conf.j2'
+    dest: "{{ nginx_conf_path }}/{{ fqdn | default('main') }}.conf"
+    owner: 'root'
+    group: 'root'
+    mode: '644'
+  vars:
+    instance_ports: "{{ instances | rejectattr('enabled', 'false') | map(attribute='port') | list }}"
+
+  notify:
+    - 'Reloading Nginx'
+
+- name: 'Starting Nginx'
+  service:
+    name: nginx
+    enabled: yes
+    state: started

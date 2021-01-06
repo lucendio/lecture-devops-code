@@ -1,0 +1,9 @@
+- hosts: instance_group
+  gather_facts: yes
+  tasks:
+    - import_tasks: './tasks/install-nginx.yaml'
+    - import_tasks: './tasks/install-podman.yaml'
+    - import_tasks: './tasks/install-postgres.yaml'
+
+  handlers:
+    - import_tasks: './tasks/reload-nginx.yaml'

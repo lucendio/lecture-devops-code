@@ -1,0 +1,37 @@
+[Unit]
+Description=Running containerized service: {{ service_name }}
+
+Wants=network.target
+After=network-online.target
+
+
+[Service]
+TimeoutStartSec=0
+Restart=always
+
+StateDirectory={{ service_name }}
+
+ExecStart=/usr/bin/podman run \
+            --name {{ service_name }} \
+            \
+            --publish "{{ postgres_port }}:{{ postgres_port }}" \
+            \
+            --env "POSTGRES_USER={{ postgres_user }}" \
+            --env "POSTGRES_PASSWORD={{ postgres_password }}" \
+            --env "POSTGRES_DB={{ postgres_db }}" \
+            --env "PGDATA=/var/lib/postgresql/data/data" \
+            --env "PGPORT={{ postgres_port }}" \
+            \
+            --volume /var/lib/{{ service_name }}:/var/lib/postgresql/data:rw \
+            \
+            --memory 256Mi \
+            --cpu-shares 256 \
+            \
+            {{ image_registry }}/{{ image_repository }}:{{ image_tag }}
+
+ExecStop=/usr/bin/podman stop --ignore --time 10 {{ service_name }}
+ExecStopPost=/usr/bin/podman rm --ignore --force {{ service_name }}
+
+
+[Install]
+WantedBy=multi-user.target
