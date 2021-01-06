@@ -11,7 +11,7 @@ Restart=always
 
 StateDirectory={{ service_name }}
 
-ExecStartPre/usr/bin/podman pull --quiet {{ image_registry }}/{{ image_repository }}:{{ image_tag }}
+ExecStartPre=/usr/bin/podman pull --quiet {{ image_registry }}/{{ image_repository }}:{{ image_tag }}
 ExecStart=/usr/bin/podman run \
             --name {{ instance_name }} \
             \

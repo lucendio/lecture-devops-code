@@ -20,7 +20,6 @@
     mode: '644'
   vars:
     instance_ports: "{{ instances | rejectattr('enabled', 'false') | map(attribute='port') | list }}"
-
   notify:
     - 'Reloading Nginx'
 

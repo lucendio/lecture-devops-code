@@ -10,7 +10,7 @@ reusing an Ansible Role*
 
 #### 0. Preparations
 
-We need a target machine to install Jenkins on. Take a look at one of the previous
+We need a machine to install Jenkins on. Take a look at one of the previous
 tutorials and take your pick - local (Vagrant) or remote (AWS).
 
 Please note, that The `Vagrantfile` in this folder requires an additional plugin to

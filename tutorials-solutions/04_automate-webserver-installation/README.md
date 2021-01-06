@@ -1,4 +1,4 @@
-04 - Automate web-server installation and apply configuration to a VM
+s04 - Automate web-server installation and apply configuration to a VM
 =====================================================================
 
 
@@ -30,11 +30,11 @@ vagrant up
 * (optional) placing Nginx-specific code in a role
 
 
-#### 4. Apply the configuration using the Ansible toolchain
+#### 4. Apply the configuration using the Ansible tool chain
 
 ```bash
 ansible-playbook -i ./inventory ./playbook.yml
 ```
 
-__NOTE:__ In case you want to let Vagrant take care of the inventory, you may want to [invoke Ansible
+__NOTE:__ In case you would like to let Vagrant take care of the inventory, you may want to [invoke Ansible
 directly from Vagrant](https://www.vagrantup.com/docs/provisioning/ansible)

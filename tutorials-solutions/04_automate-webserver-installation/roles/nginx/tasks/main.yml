@@ -38,7 +38,7 @@
 - name: 'Configuring custom vhost'
   template:
     src: 'vhost.conf.j2'
-    dest: "{{ nginx_conf_path }}/{{ fqdn | default('custom') }}.conf"
+    dest: "{{ nginx_conf_path }}/{{ fqdn | default('main') }}.conf"
     owner: 'root'
     group: 'root'
     mode: '644'

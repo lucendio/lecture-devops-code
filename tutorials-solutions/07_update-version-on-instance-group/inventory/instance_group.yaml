@@ -3,7 +3,9 @@ instance_group:
     vm: {}
   vars:
     fqdn: 'pad.vagrant.local'
+
     version: '2.3.2'
+
     instances:
       - name: 'a'
         port: '8080'
