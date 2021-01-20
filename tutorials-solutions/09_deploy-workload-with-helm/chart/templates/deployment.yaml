@@ -1,0 +1,71 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "chart.fullname" . }}
+  labels:
+    {{- include "chart.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "chart.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "chart.selectorLabels" . | nindent 8 }}
+    spec:
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          {{ if .Values.image.pullPolicy }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          {{ end }}
+          env:
+            - name: 'CMD_DOMAIN'
+              value: {{ .Values.fqdn | quote }}
+            - name: 'CMD_PORT'
+              value: {{ .Values.port | quote }}
+            - name: 'CMD_DB_URL'
+              value: >-
+                postgres://
+                {{- .Values.postgresql.postgresqlUsername -}}
+                :
+                {{- .Values.postgresql.postgresqlPassword -}}
+                @
+                {{- .Values.postgresql.fullnameOverride -}}
+                :
+                {{- .Values.postgresql.service.port -}}
+                /
+                {{- .Values.postgresql.postgresqlDatabase -}}
+        {{- range $key, $value := .Values.envVars }}
+            - name: {{ $key }}
+              value: {{ $value | quote }}
+        {{- end }}
+          ports:
+            - name: primary
+              containerPort: {{ .Values.port }}
+              protocol: TCP
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /status
+              port: primary
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /status
+              port: primary
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+            - mountPath: /home/hackmd/app/public/uploads
+              name: uploads
+      volumes:
+        - name: uploads
+          persistentVolumeClaim:
+            claimName: '{{ include "chart.fullname" . }}-uploads'
+

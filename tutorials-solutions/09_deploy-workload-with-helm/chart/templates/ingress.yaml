@@ -1,0 +1,26 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "chart.fullname" . }}
+  labels:
+    {{- include "chart.labels" . | nindent 4 }}
+  {{- with .Values.ingress.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  tls:
+    - hosts:
+      - {{ required "ERROR: fqdn required!" .Values.fqdn }}
+      secretName: '{{ include "chart.fullname" . }}-tls'
+  rules:
+    - host: {{ .Values.fqdn }}
+      http:
+        paths:
+        - pathType: Prefix
+          path: '/'
+          backend:
+            service:
+              name: {{ include "chart.fullname" . }}
+              port:
+                number: {{ .Values.service.port}}

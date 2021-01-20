@@ -1,5 +1,5 @@
-07 - Deploy a new version to an instance group
-==============================================
+08 - Get familiar with Kubernetes basics
+========================================
 
 
 ### Solution
@@ -73,7 +73,7 @@ pstree
 *__NOTE:__ `kubectl` `[cheatsheet](https://kubernetes.io/docs/reference/kubectl/cheatsheet/)*
 
 
-2. Define and deploy an application
+#### 2. Define and deploy an application
 
 Create a namespace:
 
@@ -129,7 +129,7 @@ kubectl delete pods ${DEPLOYMENT_POD_NAME} --grace-period=0 -n ${NS_NAME}
 replication count*
 
 
-3. Expose the application
+#### 3. Expose the application
 
 Write a `Service` configuration for the `Deployment` with the following specifications and
 use `kubectl` to deploy it on the cluster.
@@ -177,7 +177,7 @@ kubectl apply -n ${NS_NAME} --file ./ingress.yaml
 Finally, verify that the application is indeed accessible from your browser.
 
 
-4. Cleaning up
+#### 4. Cleaning up
 
 ```bash
 kubectl delete "${NS_NAME}"

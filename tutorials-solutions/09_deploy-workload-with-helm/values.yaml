@@ -1,0 +1,7 @@
+replicaCount: 3
+
+postgresql:
+  image:
+    registry: 'docker.io'
+    repository: 'bitnami/postgresql'
+    tag: '13.1.0'
