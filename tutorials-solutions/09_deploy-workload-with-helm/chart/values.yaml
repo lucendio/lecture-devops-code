@@ -53,9 +53,13 @@ ingress:
 
 postgresql:
   fullnameOverride: 'postgres'
-  postgresqlDatabase: 'my-db'
+  image:
+    registry: 'docker.io'
+    repository: 'bitnami/postgresql'
+    tag: '13.1.0'
   service:
     port: 5432
+  postgresqlDatabase: 'my-db'
   persistence:
     enabled: true
     existingClaim: 'pvc-db'

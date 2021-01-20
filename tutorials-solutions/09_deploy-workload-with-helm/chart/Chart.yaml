@@ -10,16 +10,3 @@ dependencies:
   - name: postgresql
     version: '10.2.2'
     repository: https://charts.bitnami.com/bitnami
-    import-values:
-      - child: global.postgresql
-        parent: postgres
-#      - child: common.names.fullname
-#        parent: database.serviceName
-#      - child: service
-#        parent: database.port
-#      - child: postgresqlDatabase
-#        parent: database.name
-#      - child: postgresqlUsername
-#        parent: database.username
-#      - child: postgresqlPassword
-#        parent: database.password

@@ -159,12 +159,12 @@ root@POD_NAME:/# curl http://${SERVICE_NAME}.${NS_NAME}.svc.cluster.local/stats
 ```
 *__NOTE:__ the response is supposed to be a JSON*
 
-To eventually make the application available from outside of the cluster, write an `Ingress` configuration 
-pointing to the `Service` you just created. Enable TLS termination.
+To eventually make the application available from outside the cluster, write an `Ingress` configuration 
+pointing to the `Service` that you just created. Enable TLS termination.
 
 *__NOTE:__ `Ingress` requires FQDNs. To get IP-based FQNDs one can either adjust `/etc/hosts` or utilize
 [nip.io](https://nip.io). The IP of you Kubernetes single node cluster can be determined with the
-command`minikube ip`*
+command `minikube ip`*
 
 ```bash
 kubectl apply -n ${NS_NAME} --file ./ingress.yaml
