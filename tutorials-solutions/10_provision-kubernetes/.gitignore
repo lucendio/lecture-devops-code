@@ -1,0 +1,3 @@
+kubespray
+inventory/hosts.yaml
+admin.conf
