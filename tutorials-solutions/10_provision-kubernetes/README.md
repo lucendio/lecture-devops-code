@@ -43,17 +43,19 @@ Use Terraform to allocate some resources on AWS. Either by reusing some of the c
     chmod 600 ./.ssh/operator*
     ```
 
-1. Initialize and run Terraform   
+1. Initialize and run Terraform
 
     ```bash
     terraform init
     ```
+    *__NOTE:__ Please refer to previous tutorial(s) for cloud provider credentials management.*
+
     ```bash
     terraform apply -var 'sshPublicKeyPath=./.ssh/operator.pub'
     ```
 
 *__NOTE:__ All of this Terraform code for AWS is by __NO__ means production-ready. Normally, the Kubernetes cluster
-would be in a private subnet with restrictive network policies, with a public load balancer in front and a bastion/jump
+would be in a private subnet with restrictive network policies, a public load balancer in front and a bastion/jump
 host to access the machines via SSH.*
 
 
@@ -81,7 +83,7 @@ host to access the machines via SSH.*
 
     Run the playbook together with the inventory you have put together.
     ```bash
-    ansible-playbook --inventory ./inventory ./kubespray/cluster.yml 
+    ansible-playbook --inventory ./inventory ./kubespray/cluster.yml
     ```
  
 

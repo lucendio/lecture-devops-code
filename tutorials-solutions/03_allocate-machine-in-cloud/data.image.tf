@@ -16,15 +16,15 @@ data "aws_ami" "image" {
     values = ["*20.04*"]
   }
 
-  filter {
-    name = "architecture"
-    values = ["x86_64"]
-  }
-
   # NOTE: pin image by setting release date
   filter {
     name = "name"
-    values = ["*20201026"]
+    values = ["*20210105"]
+  }
+
+  filter {
+    name = "architecture"
+    values = ["x86_64"]
   }
 
   filter {

@@ -14,7 +14,9 @@ chmod 600 ./.ssh/operator*
 
 #### 2. Initialize Terraform project and write configuration code in order to create a machine (aka server, instance, etc.)
 
-__NOTE:__ At this point, the necessary cloud provider credentials must have already been configured
+*__NOTE:__ At this point, the necessary cloud provider credentials (e.g. [AWS](https://registry.terraform.io/providers/hashicorp/aws/latest/docs))
+must have already been configured. For AWS, you may want to
+[use environments variables or stick with the default location `~/aws/[config, credentials]`](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html)*
 
 ```bash
 terraform init

@@ -8,7 +8,7 @@ readonly DEBUG_ENABLED=true
 readonly VERBOSE_ENABLED=false
 
 readonly AWSEDUCATE_SIGNIN_URL="https://www.awseducate.com/signin/SiteLogin"
-readonly CREDENTIALS_PATH='./creds'
+readonly AWS_CREDENTIALS_PATH='./creds'
 
 readonly CURL_REQUIRED_OPTIONS=(
     --cookie ./cookie-store.txt
@@ -28,6 +28,25 @@ else
         "${CURL_REQUIRED_OPTIONS[@]}"
     )
 fi
+
+
+if [ -f ./user.vars ]; then
+    source ./user.vars
+fi
+
+[ -z "${user}" ] && read -p " AWS Educate Username: " user
+[ -z "${pw}" ] && read -s -p " Password: " pw
+if [ -z "${role}" ]; then
+    while true; do
+        read -p " Role: student (default) or educator? [sS/eE]: " role
+        case ${role} in
+            [sS]* ) role=student; break;;
+            [eE]* ) role=educator; break;;
+            * ) role=student; break;;
+        esac
+    done
+fi
+echo ""
 
 
 function filterOutLeadingAndTrialingHiddenCharacters() {
@@ -93,12 +112,6 @@ function obtainAWSCredentials() {
 
     echo "${keyId} ${accessKey} ${sessionToken}"
 }
-
-
-
-read -p " AWS Educate Username: " user
-read -s -p " Password: " pw
-echo ""
 
 
 
@@ -179,7 +192,7 @@ returnCode=$?
 response=$( \
     curl \
         "${CURL_OPTIONS[@]}" \
-        "https://www.awseducate.com/educator/s/awssite" \
+        "https://www.awseducate.com/${role}/s/awssite" \
 )
 returnCode=$?
 (${VERBOSE_ENABLED} && echo "${response}" > ./03_awsStarterAccountSite.log.html)
@@ -220,10 +233,10 @@ response=$( \
         \
         --data-urlencode "aura.context=${auraContext}" \
         --data-urlencode "aura.token=${auraToken}" \
-        --data-urlencode 'aura.pageURI=/educator/s/awssite' \
+        --data-urlencode "aura.pageURI=/${role}/s/awssite" \
         --data-urlencode 'message={"actions":[{"id":"1;a","descriptor":"apex://StudentPageAWSAccountController/ACTION$getAWSSiteWrapper","callingDescriptor":"markup://c:awsAccount","params":{}}]}' \
         \
-        "https://www.awseducate.com/educator/s/sfsites/aura?${requestParamsForCredentials}" \
+        "https://www.awseducate.com/${role}/s/sfsites/aura?${requestParamsForCredentials}" \
 )
 returnCode=$?
 (${VERBOSE_ENABLED} && echo "${response}" > ./04_awsAccessProviderUrl.log.json)
@@ -291,8 +304,8 @@ fi
 
 read keyId accessKey sessionToken < <(obtainAWSCredentials "${accessProviderKey}")
 
-(${DEBUG_ENABLED} && echo " [DEBUG] Writing credentials to file: ${CREDENTIALS_PATH}" >&2)
-cat <<- EOF > "${CREDENTIALS_PATH}"
+(${DEBUG_ENABLED} && echo " [DEBUG] Writing credentials to file: ${AWS_CREDENTIALS_PATH}" >&2)
+cat <<- EOF > "${AWS_CREDENTIALS_PATH}"
 	[default]
 	aws_access_key_id = ${keyId}
 	aws_secret_access_key = ${accessKey}
