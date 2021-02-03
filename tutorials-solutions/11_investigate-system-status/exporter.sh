@@ -55,20 +55,20 @@ function getTotalUptime(){
 ( while true; do
 
     printf "%s\n" \
-        "HELP process_count_total Amount of running processes" \
-        "TYPE process_count_total gauge" \
+        "# HELP process_count_total Amount of running processes" \
+        "# TYPE process_count_total gauge" \
         "process_count_total $(getTotalCountOfProcesses)" \
         "" \
-        "HELP memory_utilization_total_kib Amount of currently used memory" \
-        "TYPE memory_utilization_total_kib gauge" \
+        "# HELP memory_utilization_total_kib Amount of currently used memory" \
+        "# TYPE memory_utilization_total_kib gauge" \
         "memory_utilization_total_kib $(getTotalMemoryUsage)" \
         "" \
-        "HELP uptime_total_seconds Amount of time the system is running already" \
-        "TYPE uptime_total_seconds counter" \
+        "# HELP uptime_total_seconds Amount of time the system is running already" \
+        "# TYPE uptime_total_seconds counter" \
         "uptime_total_seconds $(getTotalUptime)" \
         "" \
-        "HELP traffic_inbound_total_bytes_per_second Amount of receiving traffic within a second across all network interfaces, except lo" \
-        "TYPE traffic_inbound_total_bytes_per_second gauge" \
+        "# HELP traffic_inbound_total_bytes_per_second Amount of receiving traffic within a second across all network interfaces, except lo" \
+        "# TYPE traffic_inbound_total_bytes_per_second gauge" \
         "traffic_inbound_total_bytes_per_second $(getTotalInboundTraffic)" \
     > "${TMP_METRICS_WEB_DIR}/index.html"
 
