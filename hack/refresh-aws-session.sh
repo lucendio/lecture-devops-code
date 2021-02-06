@@ -199,21 +199,23 @@ returnCode=$?
 
 
 
-auraToken=$(echo "${response}" | grep 'var auraConfig' | tr ',' '\n' | grep token | sed 's/.*"\(.*\)"[^"]*$/\1/')
+readonly auraToken=$(echo "${response}" | grep 'var auraConfig' | tr ',' '\n' | grep 'token' | sed 's/.*"\(.*\)"[^"]*$/\1/')
 if [[ -z "${auraToken}" ]]; then
     echo " [ERROR] aura token is empty" >&2
     exit 1
 fi
-
-# NOTE: meaning and origin yet to be known
-readonly STATIC_FWUID='dDIdorNC3N22LalQ5i3slQ'
+readonly auraFwuid=$(echo "${response}" | grep 'var auraConfig' | tr ',' '\n' | grep 'fwuid' | sed 's/.*"\(.*\)"[^"]*$/\1/')
+if [[ -z "${auraFwuid}" ]]; then
+    echo " [ERROR] aura fwuid is empty" >&2
+    exit 1
+fi
 
 readonly randomNapiliAppValue=$(LC_ALL=C tr -dc 'a-zA-Z0-9' < /dev/urandom | fold -w 22 | head -n 1)
 readonly requestParamsForCredentials='r=1&other.StudentPageAWSAccount.getAWSSiteWrapper=1'
 readonly auraContext=$(cat <<- EOM
 {
     "mode": "PROD",
-    "fwuid": "${STATIC_FWUID}",
+    "fwuid": "${auraFwuid}",
     "app": "siteforce:napiliApp",
     "loaded": {
         "APPLICATION@markup://siteforce:napiliApp":"${randomNapiliAppValue}"
