@@ -4,7 +4,7 @@ set -o pipefail
 
 
 
-readonly DEBUG_ENABLED=true
+readonly DEBUG_ENABLED=false
 readonly VERBOSE_ENABLED=false
 
 readonly AWSEDUCATE_SIGNIN_URL="https://www.awseducate.com/signin/SiteLogin"
@@ -94,7 +94,7 @@ function obtainAWSCredentials() {
 
     local -r credentialsURL="https://labs.vocareum.com/util/vcput.php?a=getaws&type=0&stepid=14335&v=1&vockey=${key}"
 
-    (${DEBUG_ENABLED} && echo " [DEBUG] Requesting credentials" >&2)
+    (${DEBUG_ENABLED} && echo " [DEBUG] Requesting credentials")
 
     local -r response=$( \
         curl \
@@ -115,12 +115,12 @@ function obtainAWSCredentials() {
 
 
 
-echo " [INFO] Flushing cookie store..."
+echo " [INFO] Flushing cookie store"
 rm -rf ./cookie-store.txt
 
 
 
-(${DEBUG_ENABLED} && echo " [DEBUG] Opening AVS Educate sign in page" >&2)
+(${DEBUG_ENABLED} && echo " [DEBUG] Opening AVS Educate sign in page")
 response=$( \
     curl \
         "${CURL_OPTIONS[@]}" \
@@ -145,7 +145,8 @@ if [[ -z "${formId}" ]]; then
     exit 1
 fi
 
-(${DEBUG_ENABLED} && echo " [DEBUG] Signing in to AVS Educate" >&2)
+echo " [INFO] Logging in"
+(${DEBUG_ENABLED} && echo " [DEBUG] Signing in to AVS Educate")
 response=$( \
     curl \
         "${CURL_OPTIONS[@]}" \
@@ -174,10 +175,11 @@ returnCode=$?
 readonly redirectURL=$(echo "${response}" | xmllint --xpath "string(//meta[@name='Location']/@content)" --html - 2>/dev/null)
 if [[ -z "${redirectURL}" ]]; then
     echo " [ERROR] Sign in redirect URL is empty" >&2
+    echo " [HINT] Your login data may be wrong"
     exit 1
 fi
 
-(${DEBUG_ENABLED} && echo " [DEBUG] Following sign-in redirect" >&2)
+(${DEBUG_ENABLED} && echo " [DEBUG] Following sign-in redirect")
 response=$( \
     curl \
         "${CURL_OPTIONS[@]}" \
@@ -188,7 +190,30 @@ returnCode=$?
 
 
 
-(${DEBUG_ENABLED} && echo " [DEBUG] Going to AWS Educate Starter account site (AWS Account)" >&2)
+if [[ "${DEBUG_ENABLED}" == true ]]; then
+    echo " [DEBUG] Going to AWS Educate landing page"
+    response=$( \
+        curl \
+            "${CURL_OPTIONS[@]}" \
+            \
+            --output /dev/null \
+            --write-out '%{http_code}' \
+            \
+            "https://www.awseducate.com/${role}/s" \
+    )
+    returnCode=$?
+    (${VERBOSE_ENABLED} && echo "${response}" > ./03a_awsEducateLandingPage.log.html)
+
+    if [[ "${response}" == 5* ]]; then
+        echo " [ERROR] Server responded with error: ${response}" >&2
+        echo " [INFO] You may check your role, or investigate further by enabling verbose mode and create an Issue"
+        exit 1
+    fi
+fi
+
+
+
+(${DEBUG_ENABLED} && echo " [DEBUG] Going to AWS Educate Starter account site (AWS Account)")
 response=$( \
     curl \
         "${CURL_OPTIONS[@]}" \
@@ -227,7 +252,7 @@ readonly auraContext=$(cat <<- EOM
 EOM
 )
 
-(${DEBUG_ENABLED} && echo " [DEBUG] Requesting access provider SSO URL" >&2)
+(${DEBUG_ENABLED} && echo " [DEBUG] Requesting access provider SSO URL")
 response=$( \
     curl \
         "${CURL_OPTIONS[@]}" \
@@ -251,7 +276,7 @@ if [[ -z "${awsAccessProviderSSOUrl}" ]]; then
     exit 1
 fi
 
-(${DEBUG_ENABLED} && echo " [DEBUG] Invoking AWS Educate access provider SSO URL" >&2)
+(${DEBUG_ENABLED} && echo " [DEBUG] Invoking AWS Educate access provider SSO URL")
 response=$( \
     curl \
         "${CURL_OPTIONS[@]}" \
@@ -272,7 +297,7 @@ if echo "${response}" | grep -q '<script>window.location'; then
     #                               extract from script         remove padded newline
     forwardURL=$(echo ${response} | sed 's/^.*"\(.*\)".*/\1/' | sed -e 's/^\r//g' )
 
-    (${DEBUG_ENABLED} && echo " [DEBUG] Following access provider forward URL" >&2)
+    (${DEBUG_ENABLED} && echo " [DEBUG] Following access provider forward URL")
     response=$( \
         curl \
             "${CURL_OPTIONS[@]}" \
@@ -285,7 +310,7 @@ elif echo "${response}" | grep -q 'Access denied:SSO token expired'; then
     echo " [ERROR] AWS account session expired. Abort!" >&2
     exit 1
 else
-    echo " [INFO] still logged in to access provider" >&2
+    echo " [INFO] still logged in to access provider"
 fi
 
 
@@ -304,10 +329,11 @@ if [[ -z "${accessProviderKey}" ]]; then
     exit 1
 fi
 
-read keyId accessKey sessionToken < <(obtainAWSCredentials "${accessProviderKey}")
+echo " [INFO] Requesting AWS credentials"
+read keyId accessKey sessionToken <<< $(obtainAWSCredentials "${accessProviderKey}")
 
-(${DEBUG_ENABLED} && echo " [DEBUG] Writing credentials to file: ${AWS_CREDENTIALS_PATH}" >&2)
-cat <<- EOF > "${AWS_CREDENTIALS_PATH}"
+echo " [INFO] Writing credentials to file: ${credentialsPath:-${AWS_CREDENTIALS_PATH}}")
+cat <<- EOF > "${credentialsPath:-${AWS_CREDENTIALS_PATH}}"
 	[default]
 	aws_access_key_id = ${keyId}
 	aws_secret_access_key = ${accessKey}
