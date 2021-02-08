@@ -94,8 +94,6 @@ function obtainAWSCredentials() {
 
     local -r credentialsURL="https://labs.vocareum.com/util/vcput.php?a=getaws&type=0&stepid=14335&v=1&vockey=${key}"
 
-    (${DEBUG_ENABLED} && echo " [DEBUG] Requesting credentials")
-
     local -r response=$( \
         curl \
             "${CURL_OPTIONS[@]}" \
@@ -332,7 +330,7 @@ fi
 echo " [INFO] Requesting AWS credentials"
 read keyId accessKey sessionToken <<< $(obtainAWSCredentials "${accessProviderKey}")
 
-echo " [INFO] Writing credentials to file: ${credentialsPath:-${AWS_CREDENTIALS_PATH}}")
+echo " [INFO] Writing credentials to file: ${credentialsPath:-${AWS_CREDENTIALS_PATH}}"
 cat <<- EOF > "${credentialsPath:-${AWS_CREDENTIALS_PATH}}"
 	[default]
 	aws_access_key_id = ${keyId}
