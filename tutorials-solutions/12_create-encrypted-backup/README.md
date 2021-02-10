@@ -39,7 +39,7 @@ export TEMP_DIR=$(mktemp -d)
 cp ./* ${TEMP_DIR}/
 tar --create --gzip --file ./backup.tar.gz --directory ${TEMP_DIR} .
 rm -r ${TEMP_DIR}
-unset ${TEMP_DIR}
+unset TEMP_DIR
 ```
 
 2. Encrypt the backup file
@@ -48,7 +48,8 @@ unset ${TEMP_DIR}
 
 2a) Encrypt symmetrically
 ```
-openssl enc -aes-256-cbc -salt -k my-s3cure-Passphra5e -in ./backup.tar.gz -out ./backup.tar.gz.enc
+# INFO: will ask you to enter the symmetric key (password)
+openssl enc -aes-256-cbc -salt -in ./backup.tar.gz -out ./backup.tar.gz.enc
 ```
 
 2b) Generate a key pair (in case you don't already have a GPG key-pair) and encrypt asymmetrically
@@ -85,7 +86,8 @@ aws s3 cp s3://${BUCKET_NAME}/backup.tar.gz.enc ./
 
 2a) Decrypt symmetrically
 ```
-openssl enc -aes-256-cbc -salt -k my-s3cure-Passphra5e -d -in ./backup.tar.gz.enc -out ./backup.tar.gz
+# INFO: will ask you again to enter the symmetric key (password)
+openssl enc -aes-256-cbc -salt -d -in ./backup.tar.gz.enc -out ./backup.tar.gz
 ```
 
 2b) Decrypt asymmetrically
