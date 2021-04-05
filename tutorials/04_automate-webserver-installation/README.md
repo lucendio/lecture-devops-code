@@ -29,8 +29,3 @@
 You can either create your own *vhost* by defining a
 [`server` directive](https://docs.nginx.com/nginx/admin-guide/web-server/web-server/#setting-up-virtual-servers)
 to server your custom landing page or you override the existing default page. 
-
-
-### Solution(s)
-
-Can be found over in [lecture-devops-code](https://github.com/lucendio/lecture-devops-code/tree/master/tutorials-solutions/04_automate-webserver-installation).

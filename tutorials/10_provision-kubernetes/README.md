@@ -33,8 +33,3 @@
     * find out on which node (in case of multiple ones) the workload is scheduled
     * find out the port to which the *Service* is bound to
     * put it all together and open the URL in a browser
-
-
-### Solution(s)
-
-Can be found over in [lecture-devops-code](https://github.com/lucendio/lecture-devops-code/tree/master/tutorials-solutions/10_provision-kubernetes).

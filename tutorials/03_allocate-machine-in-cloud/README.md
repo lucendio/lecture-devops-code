@@ -31,8 +31,3 @@
 6. (Optional) Ensure that the machine has a public IP assigned and incoming traffic to the SSH port is allowed (may
    require additional resource objects)
 7. Use the private part of the previously generated SSH key and connect to the allocated machine
-
-
-### Solution(s)
-
-Can be found over in [lecture-devops-code](https://github.com/lucendio/lecture-devops-code/tree/master/tutorials-solutions/03_allocate-machine-in-cloud).

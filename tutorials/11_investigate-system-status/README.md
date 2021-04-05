@@ -28,8 +28,3 @@
 
 2. Write a small program in the language of your choice that exposes metrics in a 
    Prometheus-compatible format
-
-
-### Solution(s)
-
-Can be found over in [lecture-devops-code](https://github.com/lucendio/lecture-devops-code/tree/master/tutorials-solutions/11_investigate-system-status).

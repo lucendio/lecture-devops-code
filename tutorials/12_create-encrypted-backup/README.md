@@ -36,8 +36,3 @@
     * decrypt the artifact
     * uncompress the resulting archive
     * verify the data
-
-
-### Solution(s)
-
-Can be found over in [lecture-devops-code](https://github.com/lucendio/lecture-devops-code/tree/master/tutorials-solutions/12_create-encrypted-backup).

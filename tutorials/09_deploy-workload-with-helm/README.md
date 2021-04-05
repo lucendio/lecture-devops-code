@@ -36,8 +36,3 @@
     __NOTE:__ [The Chart Template Developer's Guide](https://helm.sh/docs/chart_template_guide/) 
 
 2. Use Sops to encrypt sensitive values and re-deploy using Helm to verify that the decryption during runtime works 
-
-
-### Solution(s)
-
-Can be found over in [lecture-devops-code](https://github.com/lucendio/lecture-devops-code/tree/master/tutorials-solutions/09_deploy-workload-with-helm-with-kubernetes).

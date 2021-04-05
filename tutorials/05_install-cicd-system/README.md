@@ -35,8 +35,3 @@
 
 *__NOTE:__You may find some of the [official tutorials](https://www.jenkins.io/doc/tutorials) helpful, or the one
 on [Docker & JcaC](https://www.digitalocean.com/community/tutorials/how-to-automate-jenkins-setup-with-docker-and-jenkins-configuration-as-code).*
-
-
-### Solution(s)
-
-Can be found over in [lecture-devops-code](https://github.com/lucendio/lecture-devops-code/tree/master/tutorials-solutions/05_install-cicd-system).

@@ -22,8 +22,3 @@
    
 2. Open up a shell in a container that contains the AWS cli. Mount your credentials into the
    container and verify that you are able to create resources.
-
-
-### Solution(s)
-
-Can be found over in [lecture-devops-code](https://github.com/lucendio/lecture-devops-code/tree/master/tutorials-solutions/01_start-container).

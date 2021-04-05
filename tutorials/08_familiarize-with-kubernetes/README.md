@@ -42,13 +42,3 @@ __NOTE:__ [cheatsheet](https://kubernetes.io/docs/reference/kubectl/cheatsheet/)
     * verify that the application is accessible from you browser
 
 For more tutorials, please have a look at the [official documentation](https://kubernetes.io/docs/tasks/)
-
-
-### Solution(s)
-
-Can be found over in [lecture-devops-code](https://github.com/lucendio/lecture-devops-code/tree/master/tutorials-solutions/08_familiarize-with-kubernetes).
-
-
-
-
-

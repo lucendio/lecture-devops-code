@@ -23,8 +23,3 @@
    
 2. Install *Nginx* into a virtual machine, expose it to the host and confirm with your browser that
    the default page is being served.
-
-
-### Solution(s)
-
-Can be found over in [lecture-devops-code](https://github.com/lucendio/lecture-devops-code/tree/master/tutorials-solutions/02_start-local-virtual-machine).
