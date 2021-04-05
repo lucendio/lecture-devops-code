@@ -2,118 +2,25 @@ Lecture: DevOps - Code Examples
 ===============================
 
 
-This repository contains executable code that is meant to serve as examples
-for the __DevOps__ lecture as part of the master's studies.
+This repository contains a variety of example code meant to showcase different
+scenarios and how to use certain technologies in those scenarios. 
 
 
-## Example: Terraform
+### Table of Contents
 
-### Requirements
-
-*   `make`
-*   `openssh`
-*   `terraform`
-*   r/w supporting DigitalOcean API token (`./.credentials/do-api-token`)
-
-
-### How to use
-
-1. `make init`
-    *   generates an ssh key pair
-    *   initializes terraform within the project 
-
-2. `make allocate`
-    *   spins up a virtual machine
-
-3. `make connect`
-    *   opens ssh connection to the virtual machine
-
-4. `make clean`
-    *   destroys all allocated resources on DigitalOcean
-    *   removes all terraform files created during runtime 
-
-
-## Example: Vagrant
-
-### Requirements
-
-*   `make`
-*   `openssh`
-*   `vagrant`
-*   VirtualBox (+ Extension Pack and Guest Additions)
-
-
-### How to use
-
-1. `make vm-prerequisites`
-    *   installs depending vagrant plugins
-
-2. `make vm-allocate`
-    *   spins up and prepares a local virtual machine 
-
-3. `make vm-status`
-    *   shows the current state of the local virtual machine
-
-4. `make vm-connect`
-    *   opens ssh connection to the virtual machine
-
-5. `make vm-clean`
-    *   destroys the local virtual machine
-    *   removes all vagrant files and logs created during runtime 
-
-## Example: Ansible 
-
-### Requirements
-
-*   `make`
-*   `ansible` v2.8.x
-*   per default the target host is the one provisioned in __Example: Vagrant__,
-    so unless another host has been added in the inventory, it is required to 
-    allocate the local virtual machine first before applying the environment 
-    configuration with Ansible
-
-### Project structure
-
-*   `./environments/local/inventory` contains all arguments for the local 
-    environment
-*   `./cm-ansible/roles` contains the whole state definition and logic
-*   `./cm-ansible/playbooks` 
-
-### How to use
-
-0. `make vm` (optional, if not already done)
-    * spins up the local virtual machine
-
-1. `make local`
-    * applies configuration for the local environment
-    
-2.  `make test-local`
-    * executes all tests defined in the respective roles
-    
-Please note that the `Makefile` contains some more "sub-commands" (aka *target*)
-worth checking out regarding Ansible, like `facts`, `vars` or `check`.
-
-
-## Example: Jenkins
-
-### Requirements
-
-Please refer to *Example: Ansible*
-
-### Project structure
-
-See `cm-ansible/roles/jenkins/README.md` for mor information. Examples for pipelines can be found in `./cicd`
-
-### How to use
-
-0. Install Jenkins with the help of Ansible (see playbook `main.yaml`)
-
-### Add a node
-
-1. Create a node via Jenkins UI:
-   Manage Jenkins > Manage Nodes > New Node > Node name: `agent_name` (Ansible variable) + *Permanent Agent* > 
-   Launch method: *Launch agent by connecting it to the master* > *Save*
-   
-2. Obtain agent secret by selecting node from list & set `agent_secret` in Jenkins inventory file accordingly
-
-3. Apply changes via Ansible
+* [X] [Tutorials](./tutorials/README.md)
+    * Vagrant (+ Virtualbox)
+    * Terraform (+ AWS)
+    * Helm
+    * Kubernetes
+    * Docker
+    * Ansible
+* [ ] [Scenarios](./scenarios):
+    * [X] [use Ansible to configure containerized services (Jenkins, Redmine)](./scenarios/ansible) 
+* [X] [Code snippets and small pieces for certain technologies](./pieces)
+    * [Container/Docker file](./pieces/containers)
+    * Terraform:
+        * [DigitalOcean machine](./pieces/terraform/digitalocean)
+        * [File & folder structure boilerplate](./pieces/terraform/file-folder-structure-boilerplate)
+        * [Hetzner-CLoud machine](./pieces/terraform/hcloud)
+* [X] [Script to refresh AWS Educate session credentials](./hack/refresh-aws-session.sh)

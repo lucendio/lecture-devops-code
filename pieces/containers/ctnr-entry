@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+
+
+BIND_PORT=${1:-8080}
+
+
+exec node ${HOME}/main.js --port ${BIND_PORT}

@@ -4,7 +4,7 @@
 .local
 .vagrant
 
-.terraform
+.terraform*
 *.tfstate*
 
 .ssh

@@ -1,0 +1,43 @@
+FROM fedora:32
+
+ARG NODEJS_VERSION='10.16.3'
+
+
+ENV CNTROOT=/opt/ctnroot
+
+RUN dnf update -y \
+    && dnf install -y curl \
+    && dnf clean -y all
+
+WORKDIR ${CNTROOT}
+RUN ARCHIVE_FILE_NAME="node-v${NODEJS_VERSION}-linux-x64.tar.gz" \
+    && curl --silent --remote-name --location \
+        "https://nodejs.org/dist/v${NODEJS_VERSION}/${ARCHIVE_FILE_NAME}" \
+    && tar -vxz \
+           -C "${CNTROOT}" \
+           --strip 1 \
+           -f "./${ARCHIVE_FILE_NAME}" >/dev/null 2>&1 \
+    && rm -rf ${ARCHIVE_FILE_NAME}
+
+
+ENV \
+    HOME=/opt/ctnroot/src \
+    PATH=/opt/ctnroot/src/bin:/opt/ctnroot/bin:${PATH}
+
+WORKDIR ${HOME}
+COPY ./main.js ./
+
+RUN groupadd --gid 2002 ctnrgroup \
+    && useradd --uid 1001 --system --gid 2002 --home-dir ${HOME} \
+            --shell /sbin/nologin --comment "ctnr user" \
+            ctnruser \
+    && chown -R 1001:2002 ${CNTROOT}
+
+USER 1001
+
+ENTRYPOINT [ "node" ]
+CMD [ "./main.js", \
+        "--port", "8080" \
+]
+
+EXPOSE 8080
