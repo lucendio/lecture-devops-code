@@ -7,7 +7,7 @@ worked on during class. Ideally, every lecture topic (weekly) comes with one or 
 corresponding tasks.
 
 Performing these tasks should help you to familiarize yourself with technologies you
-might be going to use in your [exercise assignment](https://github.com/lucendio/lecture-devops-materials/tree/master/assignments/exercise.md).
+might be going to use in your [project assignment](https://github.com/lucendio/lecture-devops-materials/tree/master/assignments/project-work.md).
 
 The tutorials vary a bit in their workload but still cover a small scope. Solutions may only
 utilize the basics of the technologies that are involved, while their capabilities would reach
