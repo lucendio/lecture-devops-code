@@ -42,18 +42,23 @@
       operating systems (on x86)
 
 
-4. Install Ansible
+6. Install the [Terraform CLI](https://learn.hashicorp.com/tutorials/terraform/install-cli)
+
+    * since it's a static binary, there are no prerequisites and you can pick the latest version
+
+
+5. Install Ansible
 
     * choose the latest [community package](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html#installing-the-ansible-community-package)
       (not `ansible-[core,base]`)
     * it is recommended to use `pip` the Python package manager (and latest Python 3 version)
 
 
-5. Install the Kubernetes CLI [`kubectl`](https://kubernetes.io/docs/tasks/tools/#kubectl)
+6. Install the Kubernetes CLI [`kubectl`](https://kubernetes.io/docs/tasks/tools/#kubectl)
 
     * since it's a static binary, there are no prerequisites and you can pick the latest version
 
 
-6. Install [Helm CLI](https://helm.sh/docs/intro/install/)
+7. Install [Helm CLI](https://helm.sh/docs/intro/install/)
 
     * since it's a static binary, there are no prerequisites and you can pick the latest version
