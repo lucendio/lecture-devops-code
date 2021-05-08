@@ -16,8 +16,9 @@
 
 ### Task(s)
 
-1. Start a container based on an [image](https://hub.docker.com/r/etherpad/etherpad) that run an 
-   [Etherpad server](https://github.com/ether/etherpad-lite) inside and expose the server in a way
+1. Build a container image based on a
+   [Dontainerfile](https://github.com/lucendio/lecture-devops-code/blob/master/pieces/containers/Containerfile)
+   (e.g. `Dockerfile``). Start a container based on that image and expose the server Node in a way
    so that you are able to retrieve the landing page in your browser
    
 2. Open up a shell in a container that contains the AWS cli. Mount your credentials into the
