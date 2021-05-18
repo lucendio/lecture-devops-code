@@ -11,7 +11,7 @@ mkdir -p my-virtual-machine && cd "${_}"
 vagrant init ubuntu/focal64 && vagrant up --provider virtualbox
 ```
 
-__NOTE:__ This way, the image that was chosen is implicitly downloaded, in case it is not already available
+__NOTE:__ This way, the chosen image is downloaded implicitly, if it is not already available
 locally. To do it manually: `vagrant box add generic/fedora28`
 
 ```bash
@@ -28,14 +28,14 @@ vagrant destroy
 
 #### 2. Create a virtual machine that runs Nginx inside
 
-(A) Provision a virtual machine, install Nginx and expose the port
+(A) Provision a virtual machine, install Nginx and configure port forwarding for `8080` (host) to `80` (virtual machine)
 
 ```bash
 export VAGRANT_CWD=./webserver
 vagrant up
 ```
 
-(B) Verify that Nginx is running and return its default page
+(B) Verify that Nginx is running and is returning its default page
 
 ```bash
 curl -s http://localhost:8080 | grep nginx
