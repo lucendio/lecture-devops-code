@@ -23,9 +23,6 @@
 
 3. Verify if your own custom landing page shows up in the browser  
    
-2. Install *Nginx* into a virtual machine, expose it to the host and confirm with your browser that
-   the default page is being served.
-   
 You can either create your own *vhost* by defining a
 [`server` directive](https://docs.nginx.com/nginx/admin-guide/web-server/web-server/#setting-up-virtual-servers)
-to server your custom landing page or you override the existing default page. 
+to serve your custom landing page, or you override the existing default page. 

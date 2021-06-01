@@ -38,3 +38,10 @@ ansible-playbook -i ./inventory ./playbook.yml
 
 __NOTE:__ In case you would like to let Vagrant take care of the inventory, you may want to [invoke Ansible
 directly from Vagrant](https://www.vagrantup.com/docs/provisioning/ansible)
+
+
+#### 5. Open your browser and confirm whether your changes where successful
+
+```
+http://10.0.42.23
+```
