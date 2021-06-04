@@ -1,0 +1,125 @@
+workflow:
+  rules:
+    # NOTE: don't run pipeline if commit is a Merge/Pull-Request
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      when: 'never'
+    # Otherwise:
+    - when: 'always'
+
+variables:
+  version: '0.0.$CI_PIPELINE_IID'
+
+stages:
+  - build
+  - test
+  - publish
+  - deploy
+
+
+job_build-archive:
+  stage: build
+  variables:
+    archiveFileName: '${CI_COMMIT_SHORT_SHA}-${CI_PIPELINE_IID}.tar.gz'
+  script:
+    - tar --create --gzip
+        --file "./${archiveFileName}"
+        --directory "./src"
+        .
+  artifacts:
+    paths:
+      - ./$archiveFileName
+
+job_build-image:
+  stage: build
+  tags:
+    - docker-privileged
+  image: docker:19.03.12
+  services:
+    - name: docker:19.03.12-dind
+  script:
+    - docker build
+        --file "./Containerfile"
+        --tag "${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHORT_SHA}-${CI_PIPELINE_IID}"
+        "./src"
+    # NOTE: push image to local registry so that it can be accessed in subsequent jobs
+    - docker login -u ${CI_REGISTRY_USER} -p ${CI_REGISTRY_PASSWORD} ${CI_REGISTRY}
+    - docker push "${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHORT_SHA}-${CI_PIPELINE_IID}"
+  after_script:
+    - docker image rm --force "${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHORT_SHA}-${CI_PIPELINE_IID}"
+
+job_test-image:
+  stage: test
+  tags:
+    - docker-privileged
+  image: docker:19.03.12
+  services:
+    - name: docker:19.03.12-dind
+      alias: containerhost
+  variables:
+    servicePort: '38080'
+  before_script:
+    - docker login -u ${CI_REGISTRY_USER} -p ${CI_REGISTRY_PASSWORD} ${CI_REGISTRY}
+    - docker pull "${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHORT_SHA}-${CI_PIPELINE_IID}"
+  script:
+    - docker run
+        --detach
+        --publish "${servicePort}:8080"
+        --name "${CI_PROJECT_ID}-${CI_PIPELINE_IID}"
+        "${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHORT_SHA}-${CI_PIPELINE_IID}"
+    - |
+      attempts=1
+      while (wget "http://containerhost:${servicePort}" 2>&1 || true) | grep 'Connection refused' && [ "${attempts}" -lt 5 ]; do
+        sleep 1 && echo sleeping
+        attempts=$((attempts + 1))
+      done
+    - (wget --no-cache --quiet --output-document - "http://containerhost:${servicePort}" | grep -q 'Hello World')
+        || (echo 'Test failed' && exit 1)
+  after_script:
+    # NOTE: clean up after test run (stop and remove container)
+    - docker rm --force "${CI_PROJECT_ID}-${CI_PIPELINE_IID}"
+
+
+job_uplod-archive:
+  stage: publish
+  dependencies:
+    - job_build-archive
+  image: docker.io/curlimages/curl:latest
+  variables:
+    archiveFileName: '${CI_COMMIT_SHORT_SHA}-${CI_PIPELINE_IID}.tar.gz'
+  script:
+    - 'curl
+        --header "JOB-TOKEN: ${CI_JOB_TOKEN}"
+        --upload-file "./${archiveFileName}"
+        "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/my-service/${version}/build.tar.gz"'
+
+job_uplod-image:
+  stage: publish
+  needs:
+    - job_build-image
+  tags:
+    - docker-privileged
+  image: docker:19.03.12
+  services:
+    - name: docker:19.03.12-dind
+  before_script:
+    - docker login -u ${CI_REGISTRY_USER} -p ${CI_REGISTRY_PASSWORD} ${CI_REGISTRY}
+    - docker pull "${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHORT_SHA}-${CI_PIPELINE_IID}"
+  script:
+    - docker tag "${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHORT_SHA}-${CI_PIPELINE_IID}" "${CI_REGISTRY_IMAGE}:${version}"
+    - docker push "${CI_REGISTRY_IMAGE}:${version}"
+  after_script:
+    - docker image rm --force
+        "${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHORT_SHA}-${CI_PIPELINE_IID}"
+        "${CI_REGISTRY_IMAGE}:${version}"
+
+
+job_deploy-new-version:
+  stage: deploy
+  needs:
+    - job_uplod-archive
+    - job_uplod-image
+  script:
+    # Ideally:
+    - echo "Clone configuration code that represents the deployment"
+    - echo "Commit and push changes, which will set off a CD job configured for that repository"
+    - echo "The CD job could then, for example, invoke, 'kubectl', 'terraform' or 'ansible-playbook'"

@@ -1,4 +1,4 @@
-05 - Install and set up a CI/CD system
+06 - Install and set up a CI/CD system
 ======================================
 
 
