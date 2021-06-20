@@ -12,7 +12,7 @@
 
 ### Prerequisite(s)
 
-* `kubectl` is installed to interact with the cluster
+* [`kubectl` is installed](https://kubernetes.io/docs/tasks/tools/#kubectl) to interact with the cluster
 * a reachable Kubernetes cluster
 * working credentials to authenticate against the cluster
 

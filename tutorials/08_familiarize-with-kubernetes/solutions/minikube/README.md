@@ -10,7 +10,7 @@ the [official documentation](https://kubernetes.io/docs/tasks/)*
 
 #### 0. Preparations
 
-Install [minikube](https://minikube.sigs.k8s.io/docs/start/) (k8s on a local virtual machine) and
+Install [minikube](https://minikube.sigs.k8s.io/docs/start/) (K8s on a local virtual machine) and
 create a cluster, if you don't have any available. ([see requirements](https://minikube.sigs.k8s.io/docs/start/#what-youll-need))
 
 ```bash
@@ -91,7 +91,7 @@ Write a `Deployment` configuration for `docker.io/etherpad/etherpad:1.8.7` with 
 following specifications and use `kubectl` to deploy it on the cluster.
 
 * replication of __2__
-* bind to port `5080`
+* bind to port `8080`
 * deployment strategy: rolling update
 * resource requirements (CPU, memory)
 * run non-privileged (security context)
@@ -136,7 +136,7 @@ use `kubectl` to deploy it on the cluster.
 
 * maps port `80` to port `8080`
 * TCP as protocol
-* type of load balancer
+* from type *load balancer*
 
 ```bash
 kubectl apply -n ${NS_NAME} --file ./service.yaml
