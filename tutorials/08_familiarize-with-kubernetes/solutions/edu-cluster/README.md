@@ -155,10 +155,10 @@ root@POD_NAME:/# curl http://${SERVICE_NAME}.${NS_NAME}.svc.cluster.local/stats
 To eventually make the application available from outside the cluster, write an `Ingress` configuration 
 pointing to the `Service` that you just created.
 
-*__NOTE:__ the education cluster has a dedicated load balancer, which is available under
-`141.64.6.10.edu.ris.beuth-hochschule.de`, thus Ingress host must be configured as follows: 
-`${NAME}.${NS_NAME}.141.64.6.10.edu.ris.beuth-hochschule.de`; `NAME` is an arbitrary virtual
-host name that be chosen freely*
+*__NOTE:__ the ingress controller of the education cluster runs on a single node (`141.64.6.10`)
+directly on the cluster, which is why the Ingress host must be configured as follows: 
+`${NAME}.${NS_NAME}.141.64.6.10.edu.ris.beuth-hochschule.de`; `NAME` is an arbitrary
+virtual host name that be chosen freely*
 
 ```bash
 kubectl apply -n ${NS_NAME} --file ./ingress.yaml
