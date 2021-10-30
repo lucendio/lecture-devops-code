@@ -3,16 +3,18 @@
 set -o pipefail
 
 
+readonly SELF_DIR="$(cd $(dirname ${0}) && pwd)"
+
 
 readonly DEBUG_ENABLED=false
 readonly VERBOSE_ENABLED=false
 
 readonly AWSEDUCATE_SIGNIN_URL="https://www.awseducate.com/signin/SiteLogin"
-readonly AWS_CREDENTIALS_PATH='./creds'
+readonly AWS_CREDENTIALS_PATH="${1:-"${SELF_DIR}/creds"}"
 
 readonly CURL_REQUIRED_OPTIONS=(
-    --cookie ./cookie-store.txt
-    --cookie-jar ./cookie-store.txt
+    --cookie "${SELF_DIR}/cookie-store.txt"
+    --cookie-jar "${SELF_DIR}/cookie-store.txt"
     --location
     --header 'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.111 Safari/537.36'
     --silent
@@ -30,8 +32,8 @@ else
 fi
 
 
-if [ -f ./user.vars ]; then
-    source ./user.vars
+if [ -f "${SELF_DIR}/user.vars" ]; then
+    source "${SELF_DIR}/user.vars"
 fi
 
 [ -z "${user}" ] && read -p " AWS Educate Username: " user
@@ -102,7 +104,7 @@ function obtainAWSCredentials() {
     )
     local -r returnCode=$?
 
-    (${VERBOSE_ENABLED} && echo "${response}" > ./07_obtainAWSCredentials.log.txt)
+    (${VERBOSE_ENABLED} && echo "${response}" > "${SELF_DIR}/07_obtainAWSCredentials.log.txt")
 
     local -r keyId=$(extractValue "${response}" 'aws_access_key_id')
     local -r accessKey=$(extractValue "${response}" 'aws_secret_access_key')
@@ -113,12 +115,14 @@ function obtainAWSCredentials() {
 
 
 
-echo " [INFO] Flushing cookie store"
-rm -rf ./cookie-store.txt
+if [ -f "${SELF_DIR}/cookie-store.txt" ]; then
+    echo " [INFO] Flushing cookie store"
+    rm -rf "${SELF_DIR}/cookie-store.txt"
+fi
 
 
 
-(${DEBUG_ENABLED} && echo " [DEBUG] Opening AVS Educate sign in page")
+(${DEBUG_ENABLED} && echo " [DEBUG] Opening AWS Educate sign in page")
 response=$( \
     curl \
         "${CURL_OPTIONS[@]}" \
@@ -126,14 +130,14 @@ response=$( \
         "${AWSEDUCATE_SIGNIN_URL}" \
 )
 returnCode=$?
-(${VERBOSE_ENABLED} && echo "${response}" > ./00_openSigninPage.log.html)
+(${VERBOSE_ENABLED} && echo "${response}" > "${SELF_DIR}/00_openSigninPage.log.html")
 
 
 
 viewState=$(extractHiddenInputValue "${response}" 'com.salesforce.visualforce.ViewState')
 viewStateMAC=$(extractHiddenInputValue "${response}" 'com.salesforce.visualforce.ViewStateMAC')
 viewStateVersion=$(extractHiddenInputValue "${response}" 'com.salesforce.visualforce.ViewStateVersion')
-if [[ -z "${viewState}" ]] || [[ -z "${viewState}" ]] || [[ -z "${viewState}" ]]; then
+if [[ -z "${viewState}" ]] || [[ -z "${viewStateMAC}" ]] || [[ -z "${viewStateVersion}" ]]; then
     echo " [ERROR] ViewState variables are empty" >&2
     exit 1
 fi
@@ -144,7 +148,7 @@ if [[ -z "${formId}" ]]; then
 fi
 
 echo " [INFO] Logging in"
-(${DEBUG_ENABLED} && echo " [DEBUG] Signing in to AVS Educate")
+(${DEBUG_ENABLED} && echo " [DEBUG] Signing in to AWS Educate")
 response=$( \
     curl \
         "${CURL_OPTIONS[@]}" \
@@ -165,7 +169,7 @@ response=$( \
         "${AWSEDUCATE_SIGNIN_URL}?refURL=http://www.awseducate.com/signin/SiteLogin" \
 )
 returnCode=$?
-(${VERBOSE_ENABLED} && echo "${response}" > ./01_SiteLogin.log.xml)
+(${VERBOSE_ENABLED} && echo "${response}" > "${SELF_DIR}/01_SiteLogin.log.xml")
 
 
 
@@ -184,7 +188,7 @@ response=$( \
         "${redirectURL}" \
 )
 returnCode=$?
-(${VERBOSE_ENABLED} && echo "${response}" > ./02_SigninRedirect.log.html)
+(${VERBOSE_ENABLED} && echo "${response}" > "${SELF_DIR}/02_SigninRedirect.log.html")
 
 
 
@@ -200,7 +204,7 @@ if [[ "${DEBUG_ENABLED}" == true ]]; then
             "https://www.awseducate.com/${role}/s" \
     )
     returnCode=$?
-    (${VERBOSE_ENABLED} && echo "${response}" > ./03a_awsEducateLandingPage.log.html)
+    (${VERBOSE_ENABLED} && echo "${response}" > "${SELF_DIR}/03a_awsEducateLandingPage.log.html")
 
     if [[ "${response}" == 5* ]]; then
         echo " [ERROR] Server responded with error: ${response}" >&2
@@ -218,7 +222,7 @@ response=$( \
         "https://www.awseducate.com/${role}/s/awssite" \
 )
 returnCode=$?
-(${VERBOSE_ENABLED} && echo "${response}" > ./03_awsStarterAccountSite.log.html)
+(${VERBOSE_ENABLED} && echo "${response}" > "${SELF_DIR}/03_awsStarterAccountSite.log.html")
 
 
 
@@ -264,7 +268,7 @@ response=$( \
         "https://www.awseducate.com/${role}/s/sfsites/aura?${requestParamsForCredentials}" \
 )
 returnCode=$?
-(${VERBOSE_ENABLED} && echo "${response}" > ./04_awsAccessProviderUrl.log.json)
+(${VERBOSE_ENABLED} && echo "${response}" > "${SELF_DIR}/04_awsAccessProviderUrl.log.json")
 
 
 
@@ -281,7 +285,7 @@ response=$( \
         "${awsAccessProviderSSOUrl}" \
 )
 returnCode=$?
-(${VERBOSE_ENABLED} && echo "${response}" > 05_awsAccessProviderResponse.log.xml)
+(${VERBOSE_ENABLED} && echo "${response}" > "${SELF_DIR}/05_awsAccessProviderResponse.log.xml")
 
 
 
@@ -302,7 +306,7 @@ if echo "${response}" | grep -q '<script>window.location'; then
             "${forwardURL}" \
     )
     returnCode=$?
-    (${VERBOSE_ENABLED} && echo "${response}" > 06_accessProverForward.log.html)
+    (${VERBOSE_ENABLED} && echo "${response}" > "${SELF_DIR}/06_accessProverForward.log.html")
 
 elif echo "${response}" | grep -q 'Access denied:SSO token expired'; then
     echo " [ERROR] AWS account session expired. Abort!" >&2
@@ -331,9 +335,12 @@ echo " [INFO] Requesting AWS credentials"
 read keyId accessKey sessionToken <<< $(obtainAWSCredentials "${accessProviderKey}")
 
 echo " [INFO] Writing credentials to file: ${credentialsPath:-${AWS_CREDENTIALS_PATH}}"
+mkdir -p $(dirname ${credentialsPath:-${AWS_CREDENTIALS_PATH}})
 cat <<- EOF > "${credentialsPath:-${AWS_CREDENTIALS_PATH}}"
 	[default]
 	aws_access_key_id = ${keyId}
 	aws_secret_access_key = ${accessKey}
 	aws_session_token = ${sessionToken}
 EOF
+
+echo ""
