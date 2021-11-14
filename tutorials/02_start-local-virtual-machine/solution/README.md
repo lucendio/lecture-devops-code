@@ -11,8 +11,8 @@ mkdir -p my-virtual-machine && cd "${_}"
 vagrant init ubuntu/focal64 && vagrant up --provider virtualbox
 ```
 
-__NOTE:__ This way, the chosen image is downloaded implicitly, if it is not already available
-locally. To do it manually: `vagrant box add generic/fedora28`
+__NOTE:__ This way, the chosen image is downloaded implicitly, if it's not already available
+locally. To fetch the image manually: `vagrant box add ubuntu/focal64`
 
 ```bash
 vagrant ssh
@@ -31,7 +31,7 @@ vagrant destroy
 (A) Provision a virtual machine, install Nginx and configure port forwarding for `8080` (host) to `80` (virtual machine)
 
 ```bash
-export VAGRANT_CWD=./webserver
+cd ./webserver
 vagrant up
 ```
 
@@ -47,4 +47,4 @@ Result:
 ...
 ```
 
-*A more complex example of a `Vagrantfile` can be found [here](./../../environments/local/Vagrantfile).*
+*A more complex example of a `Vagrantfile` can be found [here](./../../../scenarios/ansible/environments/local/Vagrantfile).*
