@@ -5,6 +5,7 @@
 .vagrant
 
 .terraform*
+terraform.d
 *.tfstate*
 
 .ssh

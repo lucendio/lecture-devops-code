@@ -23,4 +23,4 @@ scenarios and how to use certain technologies in those scenarios.
         * [DigitalOcean machine](./pieces/terraform/digitalocean)
         * [File & folder structure boilerplate](./pieces/terraform/file-folder-structure-boilerplate)
         * [Hetzner-CLoud machine](./pieces/terraform/hcloud)
-* [X] [Script to refresh AWS Educate session credentials](./hack/refresh-aws-session.sh)
+* [X] [Script to refresh AWS Academy session credentials](./hack/aws-academy.sh)
