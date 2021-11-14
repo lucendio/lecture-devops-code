@@ -13,13 +13,13 @@
 * [Terraform](https://learn.hashicorp.com/tutorials/terraform/install-cli) installed locally
 * credentials for a [supported](https://www.terraform.io/docs/providers/index.html#lists-of-terraform-providers)
   cloud platform
-* (Optional) additional requirements depending on the chosen *cloud provider* 
+* (Optional) additional requirements depending on the chosen *cloud provider*
 
 
 ### Task(s)
 
-1. Create an account for a cloud provider of your choice
-2. Configure the credentials locally (different depending on the provider)
+1. Create an account for a cloud provider of your choice (see [FAQ](https://github.com/lucendio/lecture-devops-infos/blob/main/faq.md))
+2. Configure the credentials locally (process is different for each cloud provider)
 3. Generate an SSH key-pair
 4. (optional) Define a *Terraform* resource to manage the SSH key
 5. Define a *Terraform* resource to allocate a virtual machine - according to your provider, e.g.
