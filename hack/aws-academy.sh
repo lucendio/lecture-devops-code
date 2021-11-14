@@ -134,7 +134,6 @@ function extractModulePath() {
 }
 
 function checkIfLoggedIn() {
-    (${DEBUG_ENABLED} && echo " [DEBUG] Checking if being logged in")
     local -r response=$( \
         curl \
             "${CURL_OPTIONS[@]}" \
@@ -162,14 +161,14 @@ function getLabStatus() {
 
     local -r statusURL="https://labs.vocareum.com/util/vcput.php?a=getawsstatus&stepid=${step}&version=0&mode=s&type=1&vockey=${key}"
 
-    (${DEBUG_ENABLED} && echo " [DEBUG] Checking Lab status")
     local -r response=$( \
         curl \
             "${CURL_OPTIONS[@]}" \
             --request GET \
-            "${credentialsURL}" \
+            "${statusURL}" \
     )
     local -r returnCode=$?
+    (${VERBOSE_ENABLED} && echo "${response}" > "${SELF_DIR}/09_LabStatus.log.txt")
 
     case "${response}" in
         *creation* )
@@ -194,17 +193,16 @@ function startLab() {
 
     local -r startURL="https://labs.vocareum.com/util/vcput.php?a=startaws&stepid=${step}&version=0&mode=s&type=1&vockey=${key}"
 
-    (${DEBUG_ENABLED} && echo " [DEBUG] Starting Lab")
     local -r response=$( \
         curl \
             "${CURL_OPTIONS[@]}" \
             --request GET \
-            "${credentialsURL}" \
+            "${startURL}" \
     )
     local -r returnCode=$?
-    (${VERBOSE_ENABLED} && echo "${response}" > "${SELF_DIR}/10_StartLab.log.json")
+    (${VERBOSE_ENABLED} && echo "${response}" > "${SELF_DIR}/09_StartLab.log.json")
 
-    if cat "${response}" | grep -q 'success'; then
+    if echo "${response}" | grep -q 'success'; then
         return 0;
     else
         echo " [ERROR] Failed to start Lab" >&2
@@ -217,19 +215,18 @@ function stopLab() {
     local -r key=$1
     local -r step=$2
 
-    local -r startURL="https://labs.vocareum.com/util/vcput.php?a=endaws&stepid=${step}&version=0&mode=s&type=1&vockey=${key}"
+    local -r stopURL="https://labs.vocareum.com/util/vcput.php?a=endaws&stepid=${step}&version=0&mode=s&type=1&vockey=${key}"
 
-    (${DEBUG_ENABLED} && echo " [DEBUG] Stopping Lab")
     local -r response=$( \
         curl \
             "${CURL_OPTIONS[@]}" \
             --request GET \
-            "${credentialsURL}" \
+            "${stopURL}" \
     )
     local -r returnCode=$?
-    (${VERBOSE_ENABLED} && echo "${response}" > "${SELF_DIR}/11_StopLab.log.json")
+    (${VERBOSE_ENABLED} && echo "${response}" > "${SELF_DIR}/09_StopLab.log.json")
 
-    if cat "${response}" | grep -q 'success'; then
+    if echo "${response}" | grep -q 'success'; then
         return 0;
     else
         echo " [ERROR] Failed to stop Lab" >&2
@@ -252,7 +249,7 @@ function obtainAWSCredentials() {
     )
     local -r returnCode=$?
 
-    (${VERBOSE_ENABLED} && echo "${response}" > "${SELF_DIR}/09_obtainAWSCredentials.log.txt")
+    (${VERBOSE_ENABLED} && echo "${response}" > "${SELF_DIR}/10_obtainAWSCredentials.log.txt")
 
     local -r keyId=$(extractValue "${response}" 'aws_access_key_id')
     local -r accessKey=$(extractValue "${response}" 'aws_secret_access_key')
@@ -424,6 +421,7 @@ fi
 
 
 
+(${DEBUG_ENABLED} && echo " [DEBUG] Checking if being logged in")
 if checkIfLoggedIn; then
     (${DEBUG_ENABLED} && echo " [DEBUG] User is logged in")
 else
@@ -557,7 +555,7 @@ fi
 
 echo " [INFO] Checking Lab status"
 read labStatus <<< $(getLabStatus "${accessProviderKey}" "${stepId}")
-
+echo " [INFO] Lab status is: ${labStatus}"
 if [[ "${labStatus}" == 'down' ]]; then
     echo " [INFO] Starting Lab"
     startLab "${accessProviderKey}" "${stepId}"
@@ -570,6 +568,7 @@ fi
 attempts=1
 while [ "${labStatus}" != 'up' ] && [ "${attempts}" -lt 5 ]; do
     read labStatus <<< $(getLabStatus "${accessProviderKey}" "${stepId}")
+    (${DEBUG_ENABLED} && echo " [DEBUG] retry: ${attempts} - status: ${labStatus}")
     sleep 2
     attempts=$((attempts + 1))
 done
