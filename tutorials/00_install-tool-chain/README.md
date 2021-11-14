@@ -11,11 +11,14 @@
 ### Notes
 
 * you may want consult your favourite package manager to search and install any of the tools
+* for Windows workstations it is recommended to use [WSL](https://docs.microsoft.com/en-us/windows/wsl/install)
+  (please refer to the [FAQ](https://github.com/lucendio/lecture-devops-infos/blob/main/faq.md#3-my-workstation-runs-microsoft-windows-where-do-i-get-a-unix-like-context-from-to-work-in)
+  for further details)
 
 
 ### Task(s)
 
-1. Install the *Amazon Web Service* or *Google Cloud Platform* CLI and verify that you can log in
+1. Install the *Amazon Web Service* and/or *Google Cloud Platform* CLI and verify that you can log in
 
     * [`awscli`](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-install.html) (v1 is also available via [pip](https://pypi.org/project/awscli/))
       Consult the [FAQ section](https://github.com/lucendio/lecture-devops-materials/blob/master/faq.md#4-how-do-i-get-access-to-aws-and-unlock-aws-educate-credits)
@@ -28,7 +31,7 @@
     * [`glcoud`](https://cloud.google.com/sdk/docs/install)
 
       ```bash
-      gcloud auth login ${BEUTH_EMAIL} --no-launch-browser 
+      gcloud auth login ${BHT_EMAIL} --no-launch-browser 
       ```
 
 2. Install a container runtime of your choice (e.g. Podman, Docker)
@@ -42,23 +45,29 @@
       operating systems (on x86)
 
 
-6. Install the [Terraform CLI](https://learn.hashicorp.com/tutorials/terraform/install-cli)
+4. Install the [Terraform CLI](https://learn.hashicorp.com/tutorials/terraform/install-cli)
 
     * since it's a static binary, there are no prerequisites and you can pick the latest version
 
 
-5. Install Ansible
+5. Install a tool that allows to declaratively define virtual machines locally on your workstation
+
+    * [Vagrant](https://www.vagrantup.com/docs/installation)
+    * [Virtualbox Provider for Terraform](https://registry.terraform.io/providers/terra-farm/virtualbox/latest/docs)
+
+
+6. Install Ansible
 
     * choose the latest [community package](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html#installing-the-ansible-community-package)
       (not `ansible-[core,base]`)
     * it is recommended to use `pip` the Python package manager (and latest Python 3 version)
 
 
-6. Install the Kubernetes CLI [`kubectl`](https://kubernetes.io/docs/tasks/tools/#kubectl)
+7. Install the Kubernetes CLI [`kubectl`](https://kubernetes.io/docs/tasks/tools/#kubectl)
 
     * since it's a static binary, there are no prerequisites and you can pick the latest version
 
 
-7. Install [Helm CLI](https://helm.sh/docs/intro/install/)
+8. Install [Helm CLI](https://helm.sh/docs/intro/install/)
 
     * since it's a static binary, there are no prerequisites and you can pick the latest version
