@@ -23,8 +23,9 @@ terraform init
 ```
 
 * find the cheapest instance type: https://aws.amazon.com/ec2/pricing/on-demand/
-* if AWS Education Program account is being used, `region` must be set to `"us-east-1"` (in `provider.tf` or via environment `AWS_DEFAULT_REGION`);
-  other available resources and services can be found [here](https://awseducate-starter-account-services.s3.amazonaws.com/AWS_Educate_Starter_Account_Services_Supported.pdf):
+* if AWS Academy Program account is being used, `region` must be set to `"us-east-1"` (in `provider.tf` or via environment `AWS_DEFAULT_REGION`);
+  other available resources and services can be found [here](https://github.com/lucendio/lecture-devops-infos/raw/main/.assets/AWS-Academy-Learner-Lab_Foundational-Services_20211002.pdf) 
+  or in the Readme mentioned [here](https://github.com/lucendio/lecture-devops-infos/blob/main/faq.md#7-how-do-i-get-access-to-aws-and-unlock-aws-academy-credits)
 
 ```bash
 terraform apply -var 'sshPublicKeyPath=./.ssh/operator.pub'

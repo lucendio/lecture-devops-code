@@ -15,10 +15,11 @@ create a cluster, if you don't have any available. ([see requirements](https://m
 
 ```bash
 minikube start \
-    --cpus=2 --memory=2048m \
+    --cpus=2 --memory=4096m \
     --container-runtime=cri-o \
     --driver=virtualbox \
-    --addons ingress
+    --addons=ingress \
+    --profile=devops-tutorial
 ```
 
 Verify that `kubectl` is configured correctly:
@@ -70,7 +71,7 @@ apt install psmisc
 pstree
 ```
 
-*__NOTE:__ `kubectl` `[cheatsheet](https://kubernetes.io/docs/reference/kubectl/cheatsheet/)*
+*__NOTE:__ `kubectl` [cheatsheet](https://kubernetes.io/docs/reference/kubectl/cheatsheet/)*
 
 
 #### 2. Define and deploy an application
@@ -81,7 +82,7 @@ Create a namespace:
 kubectl create namespace "${NS_NAME}"
 ```
 
-... and either use `-n ${NS_NAME` whenever namespaced objects are involved, or set:
+... and either use `-n ${NS_NAME}` whenever namespaced objects are involved, or set:
 
 ```bash
 kubectl config set-context --current --namespace=${NS_NAME}

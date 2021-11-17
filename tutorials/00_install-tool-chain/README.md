@@ -5,7 +5,7 @@
 ### Objective(s)
 
 * successfully install the tools used in the upcoming tutorials
-* verify that your credentials of your AWS Educate account work
+* verify that your credentials of your AWS Academy account work
 
 
 ### Notes
@@ -21,7 +21,7 @@
 1. Install the *Amazon Web Service* and/or *Google Cloud Platform* CLI and verify that you can log in
 
     * [`awscli`](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-install.html) (v1 is also available via [pip](https://pypi.org/project/awscli/))
-      Consult the [FAQ section](https://github.com/lucendio/lecture-devops-materials/blob/master/faq.md#4-how-do-i-get-access-to-aws-and-unlock-aws-educate-credits)
+      Consult the [FAQ section](https://github.com/lucendio/lecture-devops-materials/blob/master/faq.md#7-how-do-i-get-access-to-aws-and-unlock-aws-academy-credits)
       for how to obtain credentials
 
       ```bash

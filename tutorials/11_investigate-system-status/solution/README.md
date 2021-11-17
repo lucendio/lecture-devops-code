@@ -92,7 +92,7 @@ df --human-readable --print-type    # [-hT]
 
 Storage utilization in a given path:
 ```
-du --human-readable --all --max-depth d 1 ./    # [-had 1]
+du --human-readable --all --max-depth 1 ./    # [-had 1]
 ```
 
 

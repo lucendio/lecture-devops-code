@@ -5,7 +5,7 @@
 ### Objective(s)
 
 * successfully launch a container
-* verify that your credentials from your AWS Educate account work
+* verify that your credentials from your AWS Academy account work
 
 
 ### Prerequisite(s)
