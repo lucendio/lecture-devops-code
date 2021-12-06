@@ -12,7 +12,7 @@ server {
         try_files $uri $uri/ =404;
     }
 
-    location /healthz {
+    location /health {
         return 200;
     }
 }

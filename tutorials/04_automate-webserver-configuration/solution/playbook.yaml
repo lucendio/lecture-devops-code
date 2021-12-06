@@ -6,6 +6,7 @@
       vars:
         service_name: "nginx-{{ inventory_hostname }}"
 
+# NOTE: testing whether the first play was successful
 - hosts: 127.0.0.1
   connection: local
   become: false
@@ -15,7 +16,7 @@
   tasks:
     - name: "verifying that Nginx is responsive"
       uri:
-        url: "http://127.0.0.1:{{ host_port_mapping }}/healthz"
+        url: "http://127.0.0.1:{{ host_port_mapping }}/health"
         timeout: 6
       register: response
       failed_when: response.status != 200

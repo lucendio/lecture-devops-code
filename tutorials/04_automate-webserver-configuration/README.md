@@ -1,5 +1,5 @@
-04 - Automate web-server installation and apply configuration to a VM
-=====================================================================
+04 - Automate web-server installation and apply configuration to a machine
+==========================================================================
 
 
 ### Objective(s)
@@ -10,8 +10,8 @@
 
 ### Prerequisite(s)
 
-* Ansible is installed
-* a running virtual machine with SSH access - either locally (Vagrant) or in the cloud (AWS)
+* Ansible is installed ([on Windows, it's only supported to run in WSL](https://docs.ansible.com/ansible/latest/user_guide/windows_faq.html#can-ansible-run-on-windows))
+* a running virtual machine with SSH access - either locally (Vagrant) or in the cloud
 
 
 ### Task(s)

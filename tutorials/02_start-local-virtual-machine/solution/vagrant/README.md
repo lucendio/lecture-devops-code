@@ -33,7 +33,7 @@ vagrant destroy
 
 #### 2. Create a virtual machine that runs Nginx inside
 
-(A) Provision a virtual machine, install Nginx and configure port forwarding for `8080` (host) to `80` (virtual machine)
+Provision a virtual machine, install Nginx and configure port forwarding for `8080` (host) to `80` (virtual machine)
 
 *context: host/workstation*
 ```bash
@@ -41,7 +41,7 @@ cd ./webserver
 vagrant up
 ```
 
-(B) Verify that Nginx is running and is returning its default page
+Verify that Nginx is running and returns its default page
 
 *context: host/workstation*
 ```bash
