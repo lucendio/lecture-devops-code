@@ -1,4 +1,4 @@
 service_name: "{{ role_name }}"
-# fqdn: String
+fqdn: '""'
 
 web_root_path: '/var/www/html'

@@ -13,7 +13,7 @@ Vagrant.configure("2") do |instance|
     instance.vm.box = 'ubuntu/focal64'
 
     instance.vm.provider "virtualbox" do |vb|
-        vb.name = 'my-webserver'
+        vb.name = 'my-machine'
         vb.gui = false
         vb.cpus = 1
         vb.memory = "1024"

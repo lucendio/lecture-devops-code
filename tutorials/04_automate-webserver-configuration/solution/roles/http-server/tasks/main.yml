@@ -1,11 +1,11 @@
 - name: 'Installing packages'
-  ansible.builtin.package:
+  package:
     name:
       - nginx
     state: present
 
 - name: 'Ensure web root path exists'
-  ansible.builtin.file:
+  file:
     state: directory
     path: "{{ web_root_path }}"
     owner: "{{ nginx_user }}"
@@ -13,7 +13,7 @@
     mode: '755'
 
 - name: 'Putting static.html in place'
-  ansible.builtin.copy:
+  copy:
     src: "static.html"
     dest: "{{ web_root_path }}/static.html"
     owner: "{{ nginx_user }}"
@@ -21,7 +21,7 @@
     mode: '644'
 
 - name: 'Putting index.html in place'
-  ansible.builtin.template:
+  template:
     src: 'index.html.j2'
     dest: "{{ web_root_path }}/index.html"
     owner: "{{ nginx_user }}"
@@ -29,14 +29,14 @@
     mode: '644'
 
 - name: 'Disabling default vhost'
-  ansible.builtin.file:
+  file:
     state: absent
     path: '/etc/nginx/sites-enabled/default'
   notify:
     - 'Reloading Nginx'
 
 - name: 'Configuring custom vhost'
-  ansible.builtin.template:
+  template:
     src: 'vhost.conf.j2'
     dest: "{{ nginx_conf_path }}/{{ fqdn | default('main') }}.conf"
     owner: 'root'
@@ -46,7 +46,7 @@
     - 'Reloading Nginx'
 
 - name: 'Starting Nginx'
-  ansible.builtin.service:
+  service:
     name: nginx
     state: started
     enabled: yes

@@ -2,9 +2,9 @@
   gather_facts: yes
   tasks:
     - import_role:
-        name: nginx
+        name: 'http-server'
       vars:
-        service_name: "nginx-{{ inventory_hostname }}"
+        service_name: "webserver-{{ inventory_hostname }}"
 
 # NOTE: testing whether the first play was successful
 - hosts: 127.0.0.1
