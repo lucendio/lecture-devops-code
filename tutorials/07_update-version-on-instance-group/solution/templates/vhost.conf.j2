@@ -1,6 +1,6 @@
-# Based on https://hackmd.io/c/codimd-documentation/%2F%40codimd%2Fweb-server-nginx
+# Based on https://docs.hedgedoc.org/guides/reverse-proxy/#nginx
 
-upstream @codimd {
+upstream @pad {
     {% for port in instance_ports -%}
     server 127.0.0.1:{{ port }};
     {% endfor -%}
@@ -55,7 +55,7 @@ server {
 
         proxy_read_timeout 300;
         proxy_connect_timeout 300;
-        proxy_pass http://@codimd;
+        proxy_pass http://@pad;
     }
 
 }

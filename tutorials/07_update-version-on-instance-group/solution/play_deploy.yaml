@@ -1,33 +1,35 @@
 - hosts: instance_group
   gather_facts: yes
+  collections:
+    - 'ansible.builtin'
   tasks:
     - import_tasks: './tasks/install-podman.yaml'
 
-    - name: 'Configuring CodiMD instances'
+    - name: 'Configuring Service instances'
       template:
-        src: 'codimd.unit.j2'
-        dest: "/etc/systemd/system/codimd-{{ item.name }}.service"
+        src: 'myapp.unit.j2'
+        dest: "/etc/systemd/system/myapp-{{ item.name }}.service"
         owner: 'root'
         group: 'root'
         mode: '644'
       vars:
-        service_name: 'codimd'
-        instance_name: "codimd-{{ item.name }}"
+        service_name: 'myapp'
+        instance_name: "myapp-{{ item.name }}"
         instance_port: "{{ item.port }}"
-        image_registry: 'docker.io'
-        image_repository: 'hackmdio/hackmd'
+        image_registry: 'quay.io'
+        image_repository: 'hedgedoc/hedgedoc'
         image_tag: "{{ version | default('latest') }}"
         postgres_host: "{{ ansible_default_ipv4.address | default(ansible_all_ipv4_addresses[0]) }}"
       loop: "{{ instances | rejectattr('enabled', 'false') | list }}"
-      register: units_codimd
+      register: units_myapp
 
-    - name: '(Re)Starting CodiMD instances'
+    - name: '(Re)Starting Service instances'
       systemd:
-        name: "codimd-{{ item.item.name }}"
+        name: "myapp-{{ item.item.name }}"
         enabled: yes
-        state: "{{ 'restarted' if units_codimd.changed is defined and units_codimd.changed else 'started' }}"
-        daemon_reload: "{{ 'yes' if units_codimd.changed is defined and units_codimd.changed else 'no' }}"
-      loop: "{{ units_codimd.results }}"
+        state: "{{ 'restarted' if units_myapp.changed is defined and units_myapp.changed else 'started' }}"
+        daemon_reload: "{{ 'yes' if units_myapp.changed is defined and units_myapp.changed else 'no' }}"
+      loop: "{{ units_myapp.results }}"
       # NOTE roll out sequentially on a set of machines; but since the instances are all running on the
       #      same machine - hence the loop - it has no effect
       # DOCS https://docs.ansible.com/ansible/latest/user_guide/playbooks_strategies.html
@@ -38,15 +40,15 @@
       #poll: 0
 
 
-    - name: 'Stopping CodiMD instances'
+    - name: 'Stopping Service instances'
       systemd:
-        name: "codimd-{{ item.name }}"
+        name: "myapp-{{ item.name }}"
         enabled: no
         state: 'stopped'
       loop: "{{ instances | selectattr('enabled', 'false') | list }}"
 
-    - name: 'Removing CodiMD instance configuration if disabled'
+    - name: 'Removing Service instance configuration if disabled'
       file:
-        path: "/etc/systemd/system/codimd-{{ item.name }}.service"
+        path: "/etc/systemd/system/myapp-{{ item.name }}.service"
         state: 'absent'
       loop: "{{ instances | selectattr('enabled', 'false') | list }}"

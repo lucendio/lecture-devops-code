@@ -12,7 +12,7 @@
 ### Prerequisite(s)
 
 * Configuration Management Tool installed on the local development machine
-* a stateful or stateless service (containerized or not) for the instance group (e.g. [CodiMD](https://github.com/hackmdio/codimd)) 
+* a stateful or stateless service (containerized or not) for the instance group (e.g. [HedgeDoc](https://github.com/hedgedoc/hedgedoc/)) 
 * (optional) Container Runtime installed on the target system
 
 __Approach A - everything in one machine, containers as instances:__
@@ -24,7 +24,7 @@ __Approach B - machines as instances:__
 
 ### Task(s)
 
-0. Ensure that all machines exist and are accessible by CM
+0. Ensure that all machines exist and are accessible by Configuration Management tool
 
 1. Prepare the target systems by installing and configuring the following dependencies:
   * load balancer (e.g. Nginx)
@@ -36,8 +36,8 @@ only the LB is exposed to the outside world.*
 
 2. Deploy the service as an instance group containing 3 instances
 
-*__NOTE:__ Don't forget to make the load balancer aware of these instances, and, depending on whether the service
-is stateful or not, enable session persistence.*
+*__NOTE:__ Don't forget to make the load balancer aware of these instances, and enable session persistence if the
+service is stateful and needs it.*
 
 3. Implement one of the known deployment strategies by utilizing CM functionality
 

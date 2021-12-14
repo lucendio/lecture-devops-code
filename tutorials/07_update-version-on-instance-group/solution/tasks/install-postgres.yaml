@@ -1,7 +1,7 @@
-- import_tasks: './install-podman.yaml'
+- ansible.builtin.import_tasks: './install-podman.yaml'
 
 - name: 'Configuring postgres service'
-  template:
+  ansible.builtin.template:
     src: 'postgres.unit.j2'
     dest: "/etc/systemd/system/{{ postgres_service_name }}.service"
     owner: 'root'
@@ -15,7 +15,7 @@
   register: unit_postgres
 
 - name: '(Re)Starting postgres'
-  systemd:
+  ansible.builtin.systemd:
     name: 'postgres'
     enabled: yes
     state: "{{ 'restarted' if unit_postgres is defined and unit_postgres.changed else 'started' }}"

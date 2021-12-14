@@ -4,10 +4,14 @@ Description=Running containerized service: {{ service_name }}
 Wants=network.target
 After=network-online.target
 
+StartLimitIntervalSec=150s
+StartLimitBurst=4
+
 
 [Service]
-TimeoutStartSec=0
+TimeoutStartSec=30s
 Restart=always
+RestartSec=1s
 
 StateDirectory={{ service_name }}
 

@@ -4,7 +4,7 @@ instance_group:
   vars:
     fqdn: 'pad.vagrant.local'
 
-    version: '2.3.2'
+    version: '1.9.2'
 
     instances:
       - name: 'a'
@@ -14,7 +14,7 @@ instance_group:
       - name: 'c'
         port: '8082'
         # To destroy an instance, set
-        # enabled: false
+        #enabled: false
 
     nginx_conf_path: '/etc/nginx/conf.d'
 

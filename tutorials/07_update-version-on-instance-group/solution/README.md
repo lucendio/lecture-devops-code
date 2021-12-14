@@ -30,7 +30,7 @@ vagrant up
 * install container runtime
 * set up load balancer (Nginx) and configure instance group based on the list of
   instances defined in the [inventory](./inventory/instance_group.yaml)
-* start a container
+* start a database container
 
 ```bash
 ansible-playbook --inventory ./inventory ./play_configure.yaml
@@ -38,7 +38,7 @@ ansible-playbook --inventory ./inventory ./play_configure.yaml
 
 #### 2. Deploy the service as an instance group
 
-Choose a service - in this case: [CodiMD](https://github.com/hackmdio/codimd#documentation) and
+Choose a service - in this case: [HedgeDoc](https://docs.hedgedoc.org/) and
 deploy it in multiple containers as an instance group of 3 instances.
 
 ```bash
