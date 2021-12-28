@@ -62,7 +62,7 @@ sudo apt install -y nginx
 
 *context: workstation*
 ```bash
-curl -s http://localhost:8080 | grep nginx
+curl -s http://$(terraform output -raw 'instanceIPv4'):80 | grep nginx
 ```
 Result:
 ```
