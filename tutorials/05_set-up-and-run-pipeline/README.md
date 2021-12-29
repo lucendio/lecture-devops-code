@@ -22,10 +22,10 @@
 
 ### Task(s)
 
-0. Set up an empty Git repository (locally & remote) and add the following files
+0. Set up an empty Git repository (locally & remote) and add
 
-  * `Containerfile` ([source](./../../pieces/containers/Containerfile))
-  * `src/main.js` ([source](./../../pieces/containers/main.js))
+  * application code of your choosing
+  * other files/code required to build the application (e.g. container file)
 
 
 1. Choose an automation platform 
@@ -41,10 +41,15 @@ item in Jenkins and add the Github URL)*
 right 'next' to the source code it's supposed to process*
 
 
-3. Configure at least three stages (build, test, release) which would produce an artifact that is a container
-   image and/or a bundle of executable source 
+3. Configure at least three stages (build, test, release) which eventually would produce an artifact that is a 
+   container image and/or an archive bundle containing the executable source 
 
-*__NOTE:__ The example code does not contain any tests or even a test framework, but there are other ways to
+*__NOTE:__ The build steps carried out in the pipeline are probably very similar if not even the same used to build
+the application locally on your workstation. Often, it's just a matter of adding the build commands to a shell/script
+section in the pipeline definition.*
+
+*__NOTE:__ The solution does not contain any tests or even a test framework, but there are other ways to
 verify whether code works or not. Starting the app and check its response might suffice.*
 
-4. Verify via browser that the artifacts are actually published
+
+4. Verify via browser that the artifact is actually published

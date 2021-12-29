@@ -1,43 +1,14 @@
-FROM docker.io/fedora:34
-
-ARG NODEJS_VERSION='14.17.0'
+FROM public.ecr.aws/lts/ubuntu:20.04_stable
 
 
-ENV CNTROOT=/opt/ctnroot
+RUN apt update -y \
+    && apt install -y nginx
 
-RUN dnf update -y \
-    && dnf install -y curl \
-    && dnf clean -y all
+RUN sed -i 's/80/8080/' /etc/nginx/sites-available/default
 
-WORKDIR ${CNTROOT}
-RUN ARCHIVE_FILE_NAME="node-v${NODEJS_VERSION}-linux-x64.tar.gz" \
-    && curl --silent --remote-name --location \
-        "https://nodejs.org/dist/v${NODEJS_VERSION}/${ARCHIVE_FILE_NAME}" \
-    && tar -vxz \
-           -C "${CNTROOT}" \
-           --strip 1 \
-           -f "./${ARCHIVE_FILE_NAME}" >/dev/null 2>&1 \
-    && rm -rf ${ARCHIVE_FILE_NAME}
-
-
-ENV \
-    HOME=/opt/ctnroot/src \
-    PATH=/opt/ctnroot/src/bin:/opt/ctnroot/bin:${PATH}
-
-WORKDIR ${HOME}
-COPY ./main.js ./
-
-RUN groupadd --gid 2002 ctnrgroup \
-    && useradd --uid 1001 --system --gid 2002 --home-dir ${HOME} \
-            --shell /sbin/nologin --comment "ctnr user" \
-            ctnruser \
-    && chown -R 1001:2002 ${CNTROOT}
-
-USER 1001
-
-ENTRYPOINT [ "node" ]
-CMD [ "./main.js", \
-        "--port", "8080" \
+ENTRYPOINT [ "/usr/sbin/nginx" ]
+CMD [ "-g", \
+    "daemon off;" \
 ]
 
 EXPOSE 8080

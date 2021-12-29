@@ -6,7 +6,7 @@
 
 *Please note that this solution utilizes the automation platform GitLab.*
 
-Helpful links:
+__Useful links:__
 
 * [GitLab: CI/CD](https://docs.gitlab.com/ee/ci/README.html)
 * [GitLab: Keyword reference](https://docs.gitlab.com/ee/ci/yaml/README.html)
@@ -17,7 +17,7 @@ Helpful links:
 
 * create a new project
 * push the example code
-* check CI/CD settings `Settings > CI/CD` to see if anything is in order
+* check CI/CD settings `Settings > CI/CD` to see if everything is in order
 
 
 #### 1. Write a very simple pipeline and verify that it's being executed
@@ -31,6 +31,7 @@ test-job:
 
 ```
 git add .gitlab-ci.yml
+git commit -m 'testing Gitlab CI/CD with a simple pipeline'
 git push
 ```
 
@@ -48,17 +49,19 @@ a) builds an artifact (archived bundle a/o container image) - see stage: `build`
 
 *__NOTE:__ for container images, please note the docker-in-docker dilemma (see 'Useful links')*
 
-b) tests the code/artifact - see stage: `test` in `.gitlab-ci.yml`
 
-*__NOTE:__ start a container based on the image produced at build stage, or 
-[explicitly configure a container image for the job](https://docs.gitlab.com/ee/ci/yaml/README.html#image)
-that contains Node*
+b) test the code/artifact - see stage: `test` in `.gitlab-ci.yml`
+
+*__NOTE:__ start a container based on the image produced during build stage, and either check from the outside
+if Nginx runs (see solution), or from the inside by
+[explicitly configure the image built during previous stage for the test job](https://docs.gitlab.com/ee/ci/yaml/README.html#image)*
+
 
 c) publish the artifact(s) - see stage: `publish` in `.gitlab-ci.yml`
 
-*__NOTE:__ use the GitLab-internal [Package](https://docs.gitlab.com/ee/user/packages/package_registry/) and 
+*__NOTE:__ use the GitLab-internal [Package](https://docs.gitlab.com/ee/user/packages/package_registry/) or 
 [Container Image](https://docs.gitlab.com/ee/user/packages/container_registry/) Registries*
 
 #### 3. Verify that the artifacts were published
 
-Under `Packages & Registries > [Package,Container] Registry` you should be able to see and even download them
+Under `Packages & Registries > [Package,Container] Registry` you should be able to see and even download the artifact
