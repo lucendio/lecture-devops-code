@@ -1,9 +1,5 @@
 workflow:
   rules:
-    # NOTE: don't run pipeline if commit is a Merge/Pull-Request
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-      when: 'never'
-    # Otherwise:
     - when: 'always'
 
 variables:
