@@ -39,7 +39,7 @@ No pod should be listed:
 kubectl get pods
 ```
 
-Start a pod:
+Start a pod (*`POD_NAME` must be unique*):
 
 ```bash
 kubectl run ${POD_NAME} --image=docker.io/library/nginx:latest
@@ -59,12 +59,14 @@ kubectl describe pods ${POD_NAME}
 
 Connect to the running container inside that pod:
 
+*context: workstation*
 ```bash
 kubectl exec --stdin --tty ${POD_NAME} -- /bin/bash
 ```
 
 ... and inspect it:
 
+*context: pod*
 ```bash
 apt update
 apt install psmisc
@@ -85,7 +87,7 @@ kubectl create namespace "${NS_NAME}"
 ... and either use `-n ${NS_NAME}` whenever namespaced objects are involved, or set:
 
 ```bash
-kubectl config set-context --current --namespace=${NS_NAME}
+kubectl config set-context --current --namespace="${NS_NAME}"
 ```
 
 Write a `Deployment` configuration for `docker.io/etherpad/etherpad:1.8.7` with the 
@@ -155,8 +157,9 @@ etherpad-service   LoadBalancer   10.100.122.224   <pending>     80:32044/TCP   
 
 Connect to the nginx pod from (1) and verify that the `Service` resolves across the cluster:
 
+*context: pod*
 ```bash
-root@POD_NAME:/# curl http://${SERVICE_NAME}.${NS_NAME}.svc.cluster.local/stats
+curl http://${SERVICE_NAME}.${NS_NAME}.svc.cluster.local/stats
 ```
 *__NOTE:__ the response is supposed to be a JSON*
 

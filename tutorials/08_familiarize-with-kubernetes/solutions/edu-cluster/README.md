@@ -17,12 +17,12 @@ the [official documentation](https://kubernetes.io/docs/tasks/)*
    some kind of resource utilization meters in the main area of the page
 4. obtain the *Kubeconfig File* (top right) and store the content on your workstation under `~/.kube/config`
 5. navigate to *Projects/Namespaces*, click on *Add Namespaces* next to the project named after this module
-   and give the namespace a meaningful name (e.g. university account ID)
+   and give the namespace a meaningful & unique name (e.g. university account ID)
 6. [install `kubectl`](https://kubernetes.io/docs/tasks/tools/#kubectl) on your workstation, if it doesn't
    already exist
 7. moving forward, either use `-n ${NS_NAME` whenever namespaced objects are involved, or configure it as the
-   default value in your local Kubeconfig: edit the file directly by adding `contexts[*].context.namespace: ${NS_NAME}`
-   or run
+   default value in your local Kubeconfig - edit the file directly by adding `contexts[*].context.namespace: ${NS_NAME}`
+   or run:
 
 ```bash
 kubectl config set-context --current --namespace=${NS_NAME}
@@ -45,7 +45,7 @@ No pod should be listed:
 kubectl get pods
 ```
 
-Start a pod:
+Start a pod (*`POD_NAME` must be unique*):
 
 ```bash
 kubectl run ${POD_NAME} --image=docker.io/library/nginx:latest
@@ -65,12 +65,14 @@ kubectl describe pods ${POD_NAME}
 
 Connect to the running container inside that pod:
 
+*context: workstation*
 ```bash
 kubectl exec --stdin --tty ${POD_NAME} -- /bin/bash
 ```
 
 ... and inspect it:
 
+*context: pod*
 ```bash
 apt update
 apt install psmisc
@@ -82,7 +84,7 @@ pstree
 
 #### 2. Define and deploy an application
 
-Write a `Deployment` configuration for `docker.io/etherpad/etherpad:1.8.7` with the 
+Write a `Deployment` configuration for `docker.io/etherpad/etherpad:stable` with the 
 following specifications and use `kubectl` to deploy it on the cluster.
 
 * replication of __2__
@@ -149,8 +151,9 @@ etherpad-service   ClusterIP   10.43.205.119   <none>        80/TCP    41m   app
 
 Connect to the nginx pod from (1) and verify that the `Service` resolves across the cluster:
 
+*context: pod*
 ```bash
-root@POD_NAME:/# curl http://${SERVICE_NAME}.${NS_NAME}.svc.cluster.local/stats
+curl http://${SERVICE_NAME}.${NS_NAME}.svc.cluster.local/stats
 ```
 *__NOTE:__ the response is supposed to be a JSON*
 
@@ -158,9 +161,9 @@ To eventually make the application available from outside the cluster, write an 
 pointing to the `Service` that you just created.
 
 *__NOTE:__ the ingress controller of the education cluster runs on a single node (`141.64.6.10`)
-directly on the cluster, which is why the Ingress host must be configured as follows: 
-`${NAME}.${NS_NAME}.141.64.6.10.edu.ris.beuth-hochschule.de`; `NAME` is an arbitrary
-virtual host name that be chosen freely*
+directly on the cluster, the respective DNS entry is an A record pointing to `*.lehre.ris.beuth-hochschule.de`, 
+which is why the ingress host must be `${NAME}.lehre.ris.beuth-hochschule.de`; `NAME` is an arbitrary
+virtual host name that can be chosen freely but must be unique (e.g. the namespace from earlier)*
 
 ```bash
 kubectl apply -n ${NS_NAME} --file ./ingress.yaml

@@ -5,7 +5,7 @@
 ### Objective(s)
 
 * basic knowledge of how to interact with `kubectl`
-* write manifests
+* write Kubernetes objects
 * schedule workload
 * inspect & debug workload
 
@@ -41,4 +41,4 @@ __NOTE:__ [cheatsheet](https://kubernetes.io/docs/reference/kubectl/cheatsheet/)
     * inspect the service
     * verify that the application is accessible from you browser
 
-For more tutorials, please have a look at the [official documentation](https://kubernetes.io/docs/tasks/)
+For more tutorials, please refer to the [official documentation](https://kubernetes.io/docs/tasks/)
