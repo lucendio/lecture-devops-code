@@ -101,7 +101,7 @@ following specifications and use `kubectl` to deploy it on the cluster.
 * health checks (aka probes)
 
 ```bash
-kubectl apply -n ${NS_NAME} --file ./deployment.yaml
+kubectl apply -n ${NS_NAME} --filename ./deployment.yaml
 ```
 
 *__NOTE:__ it is also possible to define the namespace in the configuration file: `metadata.namespace: '${NS_NAME}'`* 
@@ -142,7 +142,7 @@ use `kubectl` to deploy it on the cluster.
 * from type *load balancer*
 
 ```bash
-kubectl apply -n ${NS_NAME} --file ./service.yaml
+kubectl apply -n ${NS_NAME} --filename ./service.yaml
 ```
 
 Verify whether the configuration of the `Service` was successful:
@@ -171,7 +171,7 @@ pointing to the `Service` that you just created. Enable TLS termination.
 command `minikube ip`*
 
 ```bash
-kubectl apply -n ${NS_NAME} --file ./ingress.yaml
+kubectl apply -n ${NS_NAME} --filename ./ingress.yaml
 ```
 
 *__NOTE:__ since this solution makes use of the minikube ingress addon and thus the

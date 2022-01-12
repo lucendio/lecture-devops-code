@@ -90,7 +90,7 @@ following specifications and use `kubectl` to deploy it on the cluster.
 * health checks (aka probes)
 
 ```bash
-kubectl apply -n ${NS_NAME} --file ./deployment.yaml
+kubectl apply -n ${NS_NAME} --filename ./deployment.yaml
 ```
 
 *__NOTE:__ it is also possible to define the namespace in the configuration file: `metadata.namespace: '${NS_NAME}'`* 
@@ -131,7 +131,7 @@ use `kubectl` to deploy it on the cluster.
 * from type *Cluster IP*
 
 ```bash
-kubectl apply -n ${NS_NAME} --file ./service.yaml
+kubectl apply -n ${NS_NAME} --filename ./service.yaml
 ```
 
 Verify whether the configuration of the `Service` was successful:
@@ -161,7 +161,7 @@ which is why the ingress host must be `${NAME}.lehre.ris.beuth-hochschule.de`; `
 virtual host name that can be chosen freely but must be unique (e.g. the namespace from earlier)*
 
 ```bash
-kubectl apply -n ${NS_NAME} --file ./ingress.yaml
+kubectl apply -n ${NS_NAME} --filename ./ingress.yaml
 ```
 
 Finally, verify that the application is indeed accessible from your browser.
