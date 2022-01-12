@@ -13,7 +13,7 @@
 ### Prerequisite(s)
 
 * [`kubectl` is installed](https://kubernetes.io/docs/tasks/tools/#kubectl) to interact with the cluster
-* a reachable Kubernetes cluster
+* a reachable Kubernetes cluster (e.g. [Minikube](https://minikube.sigs.k8s.io/docs/start/), [university cluster](https://github.com/lucendio/lecture-devops-infos/blob/main/faq.md#11-how-to-obtain-the-kubeconfig-kubeconfig-file-necessary-to-access-the-universitys-kubernetes-cluster), [cloud provider](https://github.com/lucendio/lecture-devops-infos/blob/main/faq.md#6-which-cloud-provider-should-i-use))
 * working credentials to authenticate against the cluster
 
 

@@ -10,17 +10,12 @@ the [official documentation](https://kubernetes.io/docs/tasks/)*
 
 #### 0. Preparations
 
-1. log in to the [cluster management web console](https://rancher.ris.beuth-hochschule.de) (VPN access requires)
-   with your university account 
-2. click on *edu-cluster* in the list of clusters
-3. click on *cluster* in the main navigation bar (top left next to *edu-cluster*) - you should see
-   some kind of resource utilization meters in the main area of the page
-4. obtain the *Kubeconfig File* (top right) and store the content on your workstation under `~/.kube/config`
-5. navigate to *Projects/Namespaces*, click on *Add Namespaces* next to the project named after this module
+1. [login and obtain the *Kubeconfig File*](https://github.com/lucendio/lecture-devops-infos/blob/main/faq.md#11-how-to-obtain-the-kubeconfig-kubeconfig-file-necessary-to-access-the-universitys-kubernetes-cluster)
+2. navigate to *Projects/Namespaces*, click on *Add Namespaces* next to the project named after this module
    and give the namespace a meaningful & unique name (e.g. university account ID)
-6. [install `kubectl`](https://kubernetes.io/docs/tasks/tools/#kubectl) on your workstation, if it doesn't
+3. [install `kubectl`](https://kubernetes.io/docs/tasks/tools/#kubectl) on your workstation, if it doesn't
    already exist
-7. moving forward, either use `-n ${NS_NAME` whenever namespaced objects are involved, or configure it as the
+4. moving forward, either use `-n ${NS_NAME` whenever namespaced objects are involved, or configure it as the
    default value in your local Kubeconfig - edit the file directly by adding `contexts[*].context.namespace: ${NS_NAME}`
    or run:
 
