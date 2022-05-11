@@ -64,7 +64,7 @@ Start a container:
 ```bash
 docker run \
     --name aws-container \
-    --mount type=bind,source=/home/vagrant,destination=/root/.aws,readonly \
+    --mount type=bind,source=${HOME}/.aws,destination=/root/.aws,readonly \
     --detach \
     --entrypoint sh \
     docker.io/amazon/aws-cli \
@@ -73,7 +73,7 @@ docker run \
 
 Allocate a shell in the container:
 ```bash
-docker exec \    
+docker exec \
     --interactive \
     --tty \
     aws-container \
