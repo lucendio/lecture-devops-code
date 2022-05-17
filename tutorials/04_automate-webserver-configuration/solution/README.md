@@ -39,6 +39,10 @@ ansible-playbook -i ./inventory ./playbook.yml
 __NOTE:__ If you want Vagrant to take care of the inventory, you may [invoke Ansible
 directly from Vagrant](https://www.vagrantup.com/docs/provisioning/ansible)
 
+__NOTE:__ If you are on Windows, which is not supported as Ansible control host and
+[WSL](https://docs.microsoft.com/windows/wsl/install) is not an option, you may
+[invoke Ansible locally within the virtual machine via Vagrant](https://www.vagrantup.com/docs/provisioning/ansible_local)
+
 
 #### 5. Open your browser and confirm whether your changes where successful
 
