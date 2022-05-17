@@ -43,7 +43,7 @@ of your least distrust for other tooling to create such disk image.
 
 *context: host/workstation (macOS)*
 ```bash
- hdiutil makehybrid -o ./datasource.iso ./cloud-init -iso -joliet -joliet-volume-name cidata -iso-volume-name cidata
+hdiutil makehybrid -o ./datasource.iso ./cloud-init -iso -joliet -joliet-volume-name cidata -iso-volume-name cidata
 ```
 OR
 *context: host/workstation (Linux)*
