@@ -8,7 +8,7 @@ metadata:
     nginx.ingress.kubernetes.io/session-cookie-name: 'express_sid'
 spec:
   rules:
-  - host: ${NAME}.lehre.ris.beuth-hochschule.de
+  - host: ${NAME}.lehre.ris.bht-berlin.de
     http:
       paths:
       - pathType: ImplementationSpecific

@@ -12,7 +12,7 @@ the [official documentation](https://kubernetes.io/docs/tasks/)*
 
 1. [login and obtain the *Kubeconfig File*](https://github.com/lucendio/lecture-devops-infos/blob/main/faq.md#11-how-to-obtain-the-kubeconfig-kubeconfig-file-necessary-to-access-the-universitys-kubernetes-cluster)
 2. navigate to *Projects/Namespaces*, click on *Add Namespaces* next to the project named after this module
-   and give the namespace a meaningful & unique name (e.g. university account ID)
+   and give the namespace a meaningful & unique name (e.g. university/student account ID)
 3. [install `kubectl`](https://kubernetes.io/docs/tasks/tools/#kubectl) on your workstation, if it doesn't
    already exist
 4. moving forward, either use `-n ${NS_NAME` whenever namespaced objects are involved, or configure it as the
@@ -156,9 +156,10 @@ To eventually make the application available from outside the cluster, write an 
 pointing to the `Service` that you just created.
 
 *__NOTE:__ the ingress controller of the education cluster runs on a single node (`141.64.6.10`)
-directly on the cluster, the respective DNS entry is an A record pointing to `*.lehre.ris.beuth-hochschule.de`, 
-which is why the ingress host must be `${NAME}.lehre.ris.beuth-hochschule.de`; `NAME` is an arbitrary
-virtual host name that can be chosen freely but must be unique (e.g. the namespace from earlier)*
+directly on the cluster, the respective DNS entry is an A record pointing to `*.lehre.ris.bht-berlin.de`, 
+which is why the ingress host must be set to`${SUB_DOMAIN}.lehre.ris.bht-berlin.de`, where `SUB_DOMAIN`
+is a virtual but globally unique host name with the format: `SUB_DOMAIN=${SERVICE_NAME}-${NS_NAME}`, e.g.
+`myservice-987456.lehre.ris.bht-berlin.de` (see [2. in Preparations section](#Preparations))*
 
 ```bash
 kubectl apply -n ${NS_NAME} --filename ./ingress.yaml
