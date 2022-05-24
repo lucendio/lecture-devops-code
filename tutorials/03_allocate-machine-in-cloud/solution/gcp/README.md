@@ -21,8 +21,8 @@ chmod 600 ./.ssh/operator*
   * log in and add your coupon to [Google Cloud](https://console.cloud.google.com/education)
   * enable billing for [*Compute Engine*](https://console.cloud.google.com/compute) API
   * it's recommended to [create a service account](https://cloud.google.com/docs/authentication/production#create_service_account)
-    instead of authenticating your personal account through the `gcloud` CLI (for this tutorial, , the service account
-    must have assigned the role *Compute Engine > Compute Admin*
+    instead of authenticating your personal account through the `gcloud` CLI (for this tutorial, the role
+    *Compute Engine > Compute Admin* must be assigned to the service account 
 
 ```bash
 terraform init \
@@ -36,7 +36,7 @@ terraform init \
 
 ```bash
 terraform apply \
-  -var 'sshPublicKeyPath=./.ssh/operator.pub'
+  -var 'sshPublicKeyPath=./.ssh/operator.pub' \
   -var 'gcpCredentialsFilePath={{ REPLACE_WITH_KEY_FILE_PATH }}'
 ```
 
