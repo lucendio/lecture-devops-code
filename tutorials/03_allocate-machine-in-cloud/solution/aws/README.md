@@ -14,7 +14,7 @@ chmod 600 ./.ssh/operator*
 
 #### 2. Set up cloud provider and initialize the Terraform root module
 
-*__NOTE:__ At this point, the necessary cloud provider credentials (e.g. [AWS](https://registry.terraform.io/providers/hashicorp/aws/latest/docs))
+*__NOTE:__* At this point, the necessary cloud provider credentials (e.g. [AWS](https://registry.terraform.io/providers/hashicorp/aws/latest/docs))
 must have already been configured. For AWS, 
 
 * set a *region* - in `provider.tf` or via environment `AWS_DEFAULT_REGION` (note that if AWS Academy Program account
@@ -22,7 +22,7 @@ must have already been configured. For AWS,
 * obtain credentials:
   * if eligible see FAQ on [how to get credentials provided by AWS Academy](https://github.com/lucendio/lecture-devops-infos/blob/main/faq.md#7-how-do-i-get-access-to-aws-and-unlock-aws-academy-credits) 
   * you may want to
-    [use environment variables or stick with the default location `~/aws/[config, credentials]`](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html)*  
+    [use environment variables or stick with the default location `~/.aws/[config, credentials]`](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html)*  
 
 ```bash
 terraform init

@@ -13,13 +13,16 @@ readonly AWSACADEMY_INSTRUCTURE_ROOT_URL='https://awsacademy.instructure.com'
 readonly AWSACADEMY_INSTRUCTURE_TEACHER_LOGIN_URL="${AWSACADEMY_INSTRUCTURE_ROOT_URL}/login/saml"
 readonly AWSACADEMY_INSTRUCTURE_STUDENT_LOGIN_URL="${AWSACADEMY_INSTRUCTURE_ROOT_URL}/login/canvas"
 readonly AWSACADEMY_LOGIN_FORM_NAME='loginPage:siteLogin:loginComponent:loginForm'
+readonly AWSACADEMY_COURSE_NAME='AWS Academy Learner Lab - Foundation Services'
 readonly AWS_CREDENTIALS_PATH="${1:-"${SELF_DIR}/creds"}"
+readonly CURL_COOKIE_STORE_PATH="${SELF_DIR}/cookie-store.txt"
 
 readonly CURL_REQUIRED_OPTIONS=(
-    --cookie "${SELF_DIR}/cookie-store.txt"
-    --cookie-jar "${SELF_DIR}/cookie-store.txt"
+    --cookie "${CURL_COOKIE_STORE_PATH}"
+    --cookie-jar "${CURL_COOKIE_STORE_PATH}"
     --location
     --header 'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.111 Safari/537.36'
+    --header 'Accept-Language: en-US'
     --silent
 )
 
@@ -133,6 +136,17 @@ function extractModulePath() {
     echo "${hrefValue}"
 }
 
+function urldecode() { : "${*//+/ }"; echo -e "${_//%/\\x}"; }
+
+function extractCSRFToken() {
+    local -r cookieStorePath=$1
+
+    local -r token=$(awk -F '\t' '{ if (match($6,"csrf_token")) {print $7} }' "${cookieStorePath}")
+    local -r decodedToken=$(urldecode "${token}")
+
+    echo "${decodedToken}"
+}
+
 function checkIfLoggedIn() {
     local -r response=$( \
         curl \
@@ -171,13 +185,16 @@ function getLabStatus() {
     (${VERBOSE_ENABLED} && echo "${response}" > "${SELF_DIR}/09_LabStatus.log.txt")
 
     case "${response}" in
-        *creation* )
+        *'creation'* )
             echo 'starting'
         ;;
-        *ready* )
+        *'ready'* )
             echo 'up'
         ;;
-        *stopped* )
+        *'stopped'* )
+            echo 'down'
+        ;;
+        *'not started'* )
             echo 'down'
         ;;
         * )
@@ -263,9 +280,9 @@ function obtainAWSCredentials() {
 # TODO: instead of flushing the session everytime the script runs,
 #       check whether user is still logged in; if so, skip login
 #
-if [ -f "${SELF_DIR}/cookie-store.txt" ]; then
+if [ -f "${CURL_COOKIE_STORE_PATH}" ]; then
     echo " [INFO] Flushing cookie store"
-    rm -rf "${SELF_DIR}/cookie-store.txt"
+    rm -rf "${CURL_COOKIE_STORE_PATH}"
 fi
 
 
@@ -431,6 +448,8 @@ fi
 
 
 
+# NOTE: this discovery mechanism only works if there is only one course with that name,
+#       which can be achieved by unpublishing older courses with the same name
 if [[ -z "${course}" ]]; then
     (${DEBUG_ENABLED} && echo " [DEBUG] Opening courses page")
     response=$( \
@@ -443,9 +462,9 @@ if [[ -z "${course}" ]]; then
     returnCode=$?
     (${VERBOSE_ENABLED} && echo "${response}" > "${SELF_DIR}/05_CoursesPage.log.html")
 
-    echo " [INFO] Determining course ID since it's not being set manually"
+    echo " [INFO] Determining course ID since it's not set manually"
 
-    read course <<< $(extractCourseId "${response}" 'AWS Academy Learner Lab - Foundation Services')
+    read course <<< $(extractCourseId "${response}" "${AWSACADEMY_COURSE_NAME}")
     if [[ -z "${course}" ]]; then
         echo " [ERROR] course ID is empty" >&2
         exit 1
@@ -454,7 +473,7 @@ fi
 
 
 
-(${DEBUG_ENABLED} && echo " [DEBUG] Opening modules page")
+(${DEBUG_ENABLED} && echo " [DEBUG] Opening modules page from course ${course}")
 response=$( \
     curl \
         "${CURL_OPTIONS[@]}" \
@@ -466,6 +485,31 @@ returnCode=$?
 (${VERBOSE_ENABLED} && echo "${response}" > "${SELF_DIR}/06_ModulesPage.log.html")
 
 
+# TODO: https://github.com/instructure/canvas-lms/blob/bca737defca8ca967a34d56c598961bfcf697cd2/ui/shared/authenticity-token/jquery/index.js#L20
+if [[ "${role}" == "teacher" ]]; then
+
+    authenticityToken=$(extractCSRFToken "${CURL_COOKIE_STORE_PATH}")
+    if [[ -z "${authenticityToken}" ]]; then
+        echo " [ERROR] authenticityToken variable is empty" >&2
+        exit 1
+    fi
+    echo " [DEBUG] csrf token: ${authenticityToken}"
+    (${DEBUG_ENABLED} && echo " [DEBUG] Opening course page (ID: ${course}) in 'student view'")
+    curl \
+        "${CURL_OPTIONS[@]}" \
+        --request POST \
+        --max-redirs '0' \
+        --referer "https://awsacademy.instructure.com/courses/${course}/modules" \
+        \
+        --data-urlencode "_method=post" \
+        --data-urlencode "authenticity_token=${authenticityToken}" \
+        \
+        "https://awsacademy.instructure.com/courses/${course}/student_view/1" \
+    returnCode=$?
+
+fi
+
+
 
 
 read modulePath <<< $(extractModulePath "${response}" 'Learner Lab - Foundational Services')
@@ -474,7 +518,7 @@ if [[ -z "${modulePath}" ]]; then
     exit 1
 fi
 
-(${DEBUG_ENABLED} && echo " [DEBUG] Opening Learner Lab module page")
+(${DEBUG_ENABLED} && echo " [DEBUG] Opening Learner Lab module page: ${modulePath}")
 response=$( \
     curl \
         "${CURL_OPTIONS[@]}" \
