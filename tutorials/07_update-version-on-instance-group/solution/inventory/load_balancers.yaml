@@ -1,5 +1,4 @@
-all:
+load_balancers:
   hosts:
-    vm:
+    lb:
       ansible_host: 'pad.vagrant.local'
-  vars: {}

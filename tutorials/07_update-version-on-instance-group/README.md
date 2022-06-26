@@ -37,7 +37,7 @@ only the LB is exposed to the outside world.*
 2. Deploy the service as an instance group containing 3 instances
 
 *__NOTE:__ Don't forget to make the load balancer aware of these instances, and enable session persistence if the
-service is stateful and needs it.*
+service is stateful and requires sticky sessions.*
 
 3. Implement one of the known deployment strategies by utilizing CM functionality
 

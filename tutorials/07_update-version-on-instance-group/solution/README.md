@@ -47,12 +47,12 @@ ansible-playbook --inventory ./inventory ./play_deploy.yaml
 
 #### 3. Implement one of the deployment strategies
 
-Utilize Ansible's [asynchronous](https://docs.ansible.com/ansible/latest/user_guide/playbooks_async.html)
+Utilize Ansible's [asynchronous](https://docs.ansible.com/ansible/latest/user_guide/playbooks_strategies.htmll)
 
 
 #### 3. Change the version and re-deploy the service
 
-Adjust `version` in  `./inventory/instance_group.yaml`
+Adjust `service_version` in  `./inventory/instance_group.yaml`
 
 ```bash
 ansible-playbook --inventory ./inventory ./play_deploy.yaml

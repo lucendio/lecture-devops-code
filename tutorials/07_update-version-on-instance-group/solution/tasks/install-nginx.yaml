@@ -14,12 +14,20 @@
 - name: 'Configuring custom vhost'
   ansible.builtin.template:
     src: 'vhost.conf.j2'
-    dest: "{{ nginx_conf_path }}/{{ fqdn | default('main') }}.conf"
+    dest: "{{ nginx_conf_path }}/{{ fqdn | default('vhost') }}.conf"
     owner: 'root'
     group: 'root'
     mode: '644'
-  vars:
-    instance_ports: "{{ instances | rejectattr('enabled', 'false') | map(attribute='port') | list }}"
+  notify:
+    - 'Reloading Nginx'
+
+- name: 'Define empty upstream, otherwise Nginx wont start'
+  ansible.builtin.template:
+    src: 'upstream.conf.j2'
+    dest: "{{ nginx_conf_path }}/{{ service_name | default('upstream') }}.conf"
+    owner: 'root'
+    group: 'root'
+    mode: '644'
   notify:
     - 'Reloading Nginx'
 

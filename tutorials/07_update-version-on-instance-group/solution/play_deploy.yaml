@@ -1,54 +1,122 @@
-- hosts: instance_group
+# NOTE: necessary so that hostvars['database'] is set in the
+#       subsequent play
+- hosts:
+    - 'database'
+  gather_facts: yes
+  tasks: []
+
+
+- name: 'Create/Update service instances'
+  hosts:
+    - 'instance_group'
+  collections:
+    - 'ansible.builtin'
+  # NOTE: two things are worth mentioning here
+  #   * the 'rolling' deployment strategy is implemented by using 'serial: 1'
+  #     DOCS: https://docs.ansible.com/ansible/latest/user_guide/playbooks_strategies.html
+  #   * this playbook reuses the existing instance group; instead, one could also create a
+  #     new group on each deployment and at the end retire the old group
+  serial: 1
+  tasks:
+    - when: not disabled | default(False)
+      vars:
+        name: "{{ service_name }}-{{ inventory_hostname }}"
+      block:
+        - name: 'Configure instance'
+          vars:
+            instance_name: "{{ name }}"
+            instance_port: "{{ port }}"
+            image_registry: 'quay.io'
+            image_repository: 'hedgedoc/hedgedoc'
+            image_tag: "{{ service_version | default('latest') }}"
+            postgres_host: >-
+              {{
+                hostvars['database'].ansible_facts.default_ipv4.address
+                | default(hostvars['database'].ansible_facts.all_ipv4_addresses[0])
+              }}
+          template:
+            src: 'myapp.unit.j2'
+            dest: "/etc/systemd/system/{{ name }}.service"
+            owner: 'root'
+            group: 'root'
+            mode: '644'
+          register: 'instance_unit'
+
+        - name: '(Re)Start instance'
+          systemd:
+            name: "{{ name }}"
+            enabled: yes
+            state: "{{ 'restarted' if instance_unit.changed is defined and instance_unit.changed else 'started' }}"
+            daemon_reload: "{{ 'yes' if instance_unit.changed is defined and instance_unit.changed else 'no' }}"
+
+        - name: 'Verify the instance started successfully'
+          command: "systemctl is-active {{ name }}"
+          retries: 6
+          delay: 2
+          register: 'result'
+          until: result.stdout == "active"
+          changed_when: false
+
+        - name: 'Verify the instance is available'
+          uri:
+            url: "http://127.0.0.1:{{ port }}"
+            timeout: 6
+          retries: 30
+          delay: 4
+          register: 'response'
+          until: response.status == 200
+
+
+- name: 'Poor mans service discovery'
+  hosts:
+    - 'lb'
   gather_facts: yes
   collections:
     - 'ansible.builtin'
   tasks:
-    - import_tasks: './tasks/install-podman.yaml'
-
-    - name: 'Configuring Service instances'
-      template:
-        src: 'myapp.unit.j2'
-        dest: "/etc/systemd/system/myapp-{{ item.name }}.service"
+    - name: 'Reconfigure load balancer'
+      vars:
+        instance_ports: >-
+          {{
+            groups['instance_group']
+            | map('extract', hostvars )
+            | rejectattr('disabled', 'true')
+            | map(attribute='port')
+          }}
+      ansible.builtin.template:
+        src: 'upstream.conf.j2'
+        dest: "{{ nginx_conf_path }}/{{ service_name | default('upstream') }}.conf"
         owner: 'root'
         group: 'root'
         mode: '644'
+      notify:
+        - 'Reloading Nginx'
+  handlers:
+    - import_tasks: './tasks/reload-nginx.yaml'
+
+
+- name: 'Retire old/disabled instances'
+  hosts:
+    - 'instance_group'
+  gather_facts: yes
+  collections:
+    - 'ansible.builtin'
+  tasks:
+    - when: disabled | default(False)
       vars:
-        service_name: 'myapp'
-        instance_name: "myapp-{{ item.name }}"
-        instance_port: "{{ item.port }}"
-        image_registry: 'quay.io'
-        image_repository: 'hedgedoc/hedgedoc'
-        image_tag: "{{ version | default('latest') }}"
-        postgres_host: "{{ ansible_default_ipv4.address | default(ansible_all_ipv4_addresses[0]) }}"
-      loop: "{{ instances | rejectattr('enabled', 'false') | list }}"
-      register: units_myapp
+        name: "{{ service_name }}-{{ inventory_hostname }}"
+      block:
+        - name: 'Stop instance'
+          systemd:
+            name: "{{ name }}"
+            enabled: no
+            state: 'stopped'
+          register: 'systemd_unit'
+          failed_when:
+            - systemd_unit.failed
+            - '"Could not find the requested service" not in systemd_unit.msg'
 
-    - name: '(Re)Starting Service instances'
-      systemd:
-        name: "myapp-{{ item.item.name }}"
-        enabled: yes
-        state: "{{ 'restarted' if units_myapp.changed is defined and units_myapp.changed else 'started' }}"
-        daemon_reload: "{{ 'yes' if units_myapp.changed is defined and units_myapp.changed else 'no' }}"
-      loop: "{{ units_myapp.results }}"
-      # NOTE roll out sequentially on a set of machines; but since the instances are all running on the
-      #      same machine - hence the loop - it has no effect
-      # DOCS https://docs.ansible.com/ansible/latest/user_guide/playbooks_strategies.html
-      throttle: 1
-      # NOTE when running all instances on one machine, run the tasks asynchronous to mimic recreation strategy
-      # DOCS: https://docs.ansible.com/ansible/latest/user_guide/playbooks_async.html
-      #async: 600
-      #poll: 0
-
-
-    - name: 'Stopping Service instances'
-      systemd:
-        name: "myapp-{{ item.name }}"
-        enabled: no
-        state: 'stopped'
-      loop: "{{ instances | selectattr('enabled', 'false') | list }}"
-
-    - name: 'Removing Service instance configuration if disabled'
-      file:
-        path: "/etc/systemd/system/myapp-{{ item.name }}.service"
-        state: 'absent'
-      loop: "{{ instances | selectattr('enabled', 'false') | list }}"
+        - name: 'Remove instance configuration'
+          file:
+            path: "/etc/systemd/system/{{ name }}.service"
+            state: 'absent'

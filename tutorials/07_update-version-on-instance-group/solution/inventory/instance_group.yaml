@@ -1,25 +1,17 @@
 instance_group:
   hosts:
-    vm: {}
+    aaa:
+      ansible_host: 'pad.vagrant.local'
+      port: '8081'
+    bbb:
+      ansible_host: 'pad.vagrant.local'
+      port: '8082'
+    ccc:
+      ansible_host: 'pad.vagrant.local'
+      port: '8083'
+      # To destroy an instance, set
+      #disabled: true
   vars:
-    fqdn: 'pad.vagrant.local'
+    service_version: '1.9.2'
 
-    version: '1.9.2'
 
-    instances:
-      - name: 'a'
-        port: '8080'
-      - name: 'b'
-        port: '8081'
-      - name: 'c'
-        port: '8082'
-        # To destroy an instance, set
-        #enabled: false
-
-    nginx_conf_path: '/etc/nginx/conf.d'
-
-    postgres_service_name: 'postgres'
-    postgres_user: 'my-db-user'
-    postgres_password: 'my-db-pw'
-    postgres_db: 'my-db-name'
-    postgres_port: '5432'

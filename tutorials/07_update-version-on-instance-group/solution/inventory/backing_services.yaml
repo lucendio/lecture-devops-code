@@ -1,0 +1,5 @@
+backing_services:
+  hosts:
+    database:
+      ansible_host: 'pad.vagrant.local'
+  vars: {}

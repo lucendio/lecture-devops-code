@@ -1,11 +1,27 @@
-- hosts: instance_group
+- hosts:
+    - 'load_balancers'
   gather_facts: yes
   collections:
     - 'ansible.builtin'
   tasks:
     - import_tasks: './tasks/install-nginx.yaml'
-    - import_tasks: './tasks/install-podman.yaml'
-    - import_tasks: './tasks/install-postgres.yaml'
-
   handlers:
     - import_tasks: './tasks/reload-nginx.yaml'
+
+
+- hosts:
+    - 'backing_services'
+  gather_facts: yes
+  collections:
+    - 'ansible.builtin'
+  tasks:
+    - import_tasks: './tasks/install-postgres.yaml'
+
+
+- hosts:
+    - 'instance_group'
+  gather_facts: yes
+  collections:
+    - 'ansible.builtin'
+  tasks:
+   - import_tasks: './tasks/install-podman.yaml'

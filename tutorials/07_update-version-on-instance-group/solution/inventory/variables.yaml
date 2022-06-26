@@ -1,0 +1,13 @@
+all:
+  vars:
+    nginx_conf_path: '/etc/nginx/conf.d'
+
+    service_name: 'myapp'
+    fqdn: 'pad.vagrant.local'
+
+    postgres_service_name: 'postgres'
+    postgres_db: 'my-db-name'
+    postgres_port: '5432'
+    postgres_user: 'my-db-user'
+    # IMPORTANT: bad practice - for demonstration purposes only
+    postgres_password: 'my-db-pw'
