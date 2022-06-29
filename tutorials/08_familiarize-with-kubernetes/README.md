@@ -1,5 +1,5 @@
-08 - Get familiar with Kubernetes basics
-========================================
+08 - Become familiar with Kubernetes basics
+===========================================
 
 
 ### Objective(s)
