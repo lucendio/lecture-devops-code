@@ -1,0 +1,32 @@
+# NOTE: default session cookie name is 'connect.sid'
+# DOCS: https://docs.hedgedoc.org/configuration/#users-and-privileges
+# REF: https://stackoverflow.com/questions/25032276/how-use-nginx-variable-cookie-with-point-cookie-like-foo-bar
+map $http_cookie $connect_sid_cookie {
+    default "";
+    "~connect\.sid=(?<connect_sid>[^;]+)" $connect_sid;
+}
+
+
+upstream @instance_group {
+    {% if instance_ports | default([]) | length <= 0 %}
+    server 127.0.0.1:65535 down;
+    {% else %}
+    {% for port in instance_ports -%}
+    server 127.0.0.1:{{ port }};
+    {% endfor -%}
+    {% endif %}
+
+    # (A) based on client IP; Note, that it only works in this
+    #     virtual demo scenario w/o a session store used by the
+    #     instances to synchronize session IDs, because all
+    #     sessions originate from the same host (IP)
+    ip_hash;
+
+    # (B) based on existing cookie set by the application server;
+    #     Note that this would still need a backing service to store
+    #     and synchronize session IDs across instances
+    #     DOCS: https://socket.io/docs/v4/using-multiple-nodes
+    # hash $connect_sid_cookie consistent;
+
+    keepalive 300;
+}

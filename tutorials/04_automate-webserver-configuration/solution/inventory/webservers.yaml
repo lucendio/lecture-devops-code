@@ -1,5 +1,0 @@
-webservers:
-  hosts:
-    instance1: {}
-  vars:
-    web_root_path: '/var/www/my-service'
