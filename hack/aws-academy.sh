@@ -13,7 +13,7 @@ readonly AWSACADEMY_INSTRUCTURE_ROOT_URL='https://awsacademy.instructure.com'
 readonly AWSACADEMY_INSTRUCTURE_TEACHER_LOGIN_URL="${AWSACADEMY_INSTRUCTURE_ROOT_URL}/login/saml"
 readonly AWSACADEMY_INSTRUCTURE_STUDENT_LOGIN_URL="${AWSACADEMY_INSTRUCTURE_ROOT_URL}/login/canvas"
 readonly AWSACADEMY_LOGIN_FORM_NAME='loginPage:siteLogin:loginComponent:loginForm'
-readonly AWSACADEMY_COURSE_NAME='AWS Academy Learner Lab - Foundation Services'
+readonly AWSACADEMY_COURSE_NAME='AWS Academy Learner Lab'
 readonly AWS_CREDENTIALS_PATH="${1:-"${SELF_DIR}/creds"}"
 readonly CURL_COOKIE_STORE_PATH="${SELF_DIR}/cookie-store.txt"
 
@@ -23,6 +23,7 @@ readonly CURL_REQUIRED_OPTIONS=(
     --location
     --header 'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.111 Safari/537.36'
     --header 'Accept-Language: en-US'
+    --header 'Connection: keep-alive'
     --silent
 )
 
@@ -512,7 +513,7 @@ fi
 
 
 
-read modulePath <<< $(extractModulePath "${response}" 'Learner Lab - Foundational Services')
+read modulePath <<< $(extractModulePath "${response}" 'Learner Lab')
 if [[ -z "${modulePath}" ]]; then
     echo " [ERROR] Module path is empty" >&2
     exit 1
