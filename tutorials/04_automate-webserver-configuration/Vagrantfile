@@ -10,7 +10,7 @@ USERNAME = 'operator'
 
 Vagrant.configure("2") do |instance|
 
-    instance.vm.box = 'ubuntu/focal64'
+    instance.vm.box = 'ubuntu/jammy64'
 
     instance.vm.provider "virtualbox" do |vb|
         vb.name = 'my-machine'
@@ -48,6 +48,4 @@ Vagrant.configure("2") do |instance|
                               apt install -y \
                                   python3
                           SHELL
-
-    instance.ansible_local ""
 end
