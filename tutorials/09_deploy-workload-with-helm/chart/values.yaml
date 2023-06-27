@@ -1,6 +1,10 @@
 nameOverride: ""
 fullnameOverride: ""
 
+enablePersistence: &persistenceIs false
+
+tlsCertificateSecretName: null
+
 image:
   registry: 'docker.io'
   repository: 'hackmdio/hackmd'
@@ -9,8 +13,8 @@ image:
 replicaCount: 1
 port: 3000
 
-# NOTE: provided via command line option
-# fqdn: example.com
+# NOTE: may be provided via command line option
+fqdn: null
 
 envVars:
   CMD_USECDN: 'false'
@@ -33,14 +37,15 @@ podSecurityContext: {}
 securityContext:
   allowPrivilegeEscalation: false
   privileged: false
-  runAsUser: 1500       # ORIGIN: https://github.com/hackmdio/docker-buildpack/blob/2d998b0c7300cd4c57f546a82dfa9a0d174fcc50/runtime/Dockerfile#L6
+  # REF: https://github.com/hackmdio/docker-buildpack/blob/2d998b0c7300cd4c57f546a82dfa9a0d174fcc50/runtime/Dockerfile#L6
+  runAsUser: 1500
   capabilities:
     drop:
       - ALL
 
 
 service:
-  type: LoadBalancer
+  type: ClusterIP
   port: 80
 
 
@@ -58,8 +63,11 @@ postgresql:
     repository: 'bitnami/postgresql'
     tag: '13.1.0'
   service:
-    port: 5432
-  postgresqlDatabase: 'my-db'
-  persistence:
-    enabled: true
-    existingClaim: 'pvc-db'
+    ports:
+      postgresql: 5432
+  auth:
+    database: 'my-db'
+  primary:
+    persistence:
+      enabled: *persistenceIs
+      existingClaim: 'pvc-db'

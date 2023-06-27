@@ -23,9 +23,9 @@ spec:
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
-          {{ if .Values.image.pullPolicy }}
+          {{- if .Values.image.pullPolicy }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
-          {{ end }}
+          {{- end }}
           env:
             - name: 'CMD_DOMAIN'
               value: {{ .Values.fqdn | quote }}
@@ -34,15 +34,15 @@ spec:
             - name: 'CMD_DB_URL'
               value: >-
                 postgres://
-                {{- .Values.postgresql.postgresqlUsername -}}
+                {{- .Values.postgresql.auth.username -}}
                 :
-                {{- .Values.postgresql.postgresqlPassword -}}
+                {{- .Values.postgresql.auth.password -}}
                 @
                 {{- .Values.postgresql.fullnameOverride -}}
                 :
-                {{- .Values.postgresql.service.port -}}
+                {{- .Values.postgresql.service.ports.postgresql -}}
                 /
-                {{- .Values.postgresql.postgresqlDatabase -}}
+                {{- .Values.postgresql.auth.database -}}
         {{- range $key, $value := .Values.envVars }}
             - name: {{ $key }}
               value: {{ $value | quote }}
@@ -68,6 +68,9 @@ spec:
               name: uploads
       volumes:
         - name: uploads
+          {{- if .Values.enablePersistence }}
           persistentVolumeClaim:
             claimName: '{{ include "chart.fullname" . }}-uploads'
-
+          {{- else }}
+          emptyDir: {}
+          {{- end }}

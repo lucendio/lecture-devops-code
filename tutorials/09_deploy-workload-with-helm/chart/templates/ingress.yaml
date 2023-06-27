@@ -12,7 +12,7 @@ spec:
   tls:
     - hosts:
       - {{ required "ERROR: fqdn required!" .Values.fqdn }}
-      secretName: '{{ include "chart.fullname" . }}-tls'
+      secretName: '{{ default ( printf "%s-tls" (include "chart.fullname" .) ) .Values.tlsCertificateSecretName }}'
   rules:
     - host: {{ .Values.fqdn }}
       http:
