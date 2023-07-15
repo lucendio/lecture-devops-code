@@ -1,6 +1,6 @@
 resource "aws_s3_bucket" "b" {
   bucket = join( "-", concat(
-    var.bucketPrefix != null ? random_string.suffix[0].keepers.bucketPrefix : [],
+    var.bucketPrefix != null ? [ random_string.suffix[0].keepers.bucketPrefix ] : [],
     [ for _, parts in random_string.suffix : parts.result ],
   ))
 
