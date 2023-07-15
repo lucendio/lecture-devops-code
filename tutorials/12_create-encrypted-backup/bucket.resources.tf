@@ -4,18 +4,39 @@ resource "aws_s3_bucket" "b" {
     [ for _, parts in random_string.suffix : parts.result ],
   ))
 
-  # Could be changed to 'public-read' if asymmetric cryptography is being used
-  acl    = "private"
-
-  versioning {
-    enabled = false
-  }
-
   force_destroy = true
+}
 
-  lifecycle_rule {
-    enabled = false
+resource "aws_s3_bucket_versioning" "b" {
+  bucket = aws_s3_bucket.b.id
 
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
+
+resource "aws_s3_bucket_ownership_controls" "b" {
+  bucket = aws_s3_bucket.b.id
+
+  rule {
+    object_ownership = "BucketOwnerPreferred"
+  }
+}
+resource "aws_s3_bucket_acl" "b" {
+  bucket = aws_s3_bucket.b.id
+
+  # Could be changed to 'public-read' if asymmetric cryptography is being used
+  acl = "private"
+
+  depends_on = [ aws_s3_bucket_ownership_controls.b ]
+}
+
+resource "aws_s3_bucket_lifecycle_configuration" "b" {
+  bucket = aws_s3_bucket.b.id
+
+  rule {
+    id = "first"
+    status = "Disabled"
     expiration {
       days = 1
     }
@@ -30,7 +51,7 @@ resource "random_string" "suffix" {
 
   lower   = true
   upper   = false
-  number  = true
+  numeric = true
   special = false
 
   keepers = {
