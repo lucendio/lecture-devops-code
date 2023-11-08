@@ -34,12 +34,25 @@ job_build:
     - if: $CI_COMMIT_REF_NAME =~ /stable/
       when: always
   image: registry.hub.docker.com/library/golang:1.21
+  parallel:
+    matrix:
+      - os: 'darwin'
+        arch: [ 'amd64', 'arm64' ]
+      - os: 'linux'
+        arch: [ 'amd64', 'arm64' ]
+      - os: 'windows'
+        arch: [ 'amd64', 'arm' ]
+  before_script:
+    - mkdir -p ./artifacts
   script:
     - go get -t ./...
-    - go build -o ./artifact.bin ./*.go
+    - GOOS=${os} GOARCH=${arch}
+        go build
+          -o ./artifacts/webservice-${os}-${arch}
+          ./*.go
   artifacts:
     paths:
-      - ./artifact.bin
+      - ./artifacts
     expire_in: 10 sec
 
 
@@ -61,7 +74,10 @@ job_upload:
     - update-ca-certificates
   script:
     - |
-      curl \
-        --header "JOB-TOKEN: ${CI_JOB_TOKEN}" \
-        --upload-file ./artifact.bin \
-        "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/artifacts/${version}/webservice"
+      for artifact in ./artifacts/*; do
+        chmod +x ${artifact}
+        curl \
+          --header "JOB-TOKEN: ${CI_JOB_TOKEN}" \
+          --upload-file ${artifact} \
+          "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/artifacts/${version}/"
+      done
