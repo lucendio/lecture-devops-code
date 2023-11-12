@@ -9,7 +9,7 @@ GUEST_USERNAME = 'vagrant'
 
 Vagrant.configure("2") do |instance|
 
-    instance.vm.box = 'ubuntu/focal64'
+    instance.vm.box = 'ubuntu/jammy64'
 
     instance.vm.provider "virtualbox" do |vb|
         vb.name = 'my-box-id'
