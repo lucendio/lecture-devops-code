@@ -130,9 +130,15 @@ function extractCourseId() {
 
 function extractModulePath() {
     local stringIn=$1
-    local moduleTitle=$2
+    local firstModuleTitlePart=$2
+    local secondModuleTitlePart=${3:-""}
 
-    local -r hrefValue=$(echo "${stringIn}" | xmllint --xpath "string(//a[@title='${moduleTitle}']/@href)" --html - 2>/dev/null)
+    local -r hrefValue=$( \
+        echo "${stringIn}" \
+        | xmllint \
+            --xpath "string(//a[contains(@title,'${firstModuleTitlePart}') and contains(@title,'${secondModuleTitlePart}')]/@href)" \
+            --html - 2>/dev/null \
+    )
 
     echo "${hrefValue}"
 }
@@ -513,7 +519,7 @@ fi
 
 
 
-read modulePath <<< $(extractModulePath "${response}" 'Learner Lab')
+read modulePath <<< $(extractModulePath "${response}" 'Learner Lab' 'Launch')
 if [[ -z "${modulePath}" ]]; then
     echo " [ERROR] Module path is empty" >&2
     exit 1
