@@ -1,3 +1,7 @@
-FROM docker.io/nginx:mainline-alpine
+FROM scratch
 
-COPY ./index.html /usr/share/nginx/html/index.html
+COPY ./artifact.bin /bin/webservice
+
+ENV HOST 0.0.0.0
+
+CMD [ "/bin/webservice" ]
