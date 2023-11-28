@@ -43,7 +43,7 @@ resource "google_compute_firewall" "fw" {
     protocol = "tcp"
     ports = [
       "22",
-      "80"
+      "8080"
     ]
   }
 

@@ -5,7 +5,7 @@ resource "aws_key_pair" "ssh" {
 
 resource "aws_instance" "vm" {
   instance_type = "t2.nano"
-  ami = "ami-053b0d53c279acc90"
+  ami = "ami-0a5f04cdf7758e9f0"
 
   count = 10
 
@@ -32,8 +32,8 @@ resource "aws_security_group" "allow-ssh-inbound" {
 
 resource "aws_security_group" "allow-http-inbound" {
   ingress {
-    from_port = 80
-    to_port = 80
+    from_port = 8080
+    to_port = 8080
     protocol = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
