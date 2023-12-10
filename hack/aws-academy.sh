@@ -58,6 +58,15 @@ fi
 echo ""
 
 
+
+which sed       1>/dev/null || ( echo 'Command: sed not installed, abort.'      && exit 1 )
+which awk       1>/dev/null || ( echo 'Command: awk not installed, abort.'      && exit 1 )
+which grep      1>/dev/null || ( echo 'Command: grep not installed, abort.'     && exit 1 )
+which xmllint   1>/dev/null || ( echo 'Command: xmllint not installed, abort.'  && exit 1 )
+which curl      1>/dev/null || ( echo 'Command: curl not installed, abort.'     && exit 1 )
+
+
+
 function filterOutLeadingAndTrialingHiddenCharacters() {
     local stringIn=$1
     local result=$(echo "${stringIn}" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
