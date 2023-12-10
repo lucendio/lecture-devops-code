@@ -34,25 +34,17 @@ job_build:
     - if: $CI_COMMIT_REF_NAME =~ /stable/
       when: always
   image: mirror.gcr.io/library/golang:1.21
-  parallel:
-    matrix:
-      - os: 'darwin'
-        arch: [ 'amd64', 'arm64' ]
-      - os: 'linux'
-        arch: [ 'amd64', 'arm64' ]
-      - os: 'windows'
-        arch: [ 'amd64', 'arm' ]
   before_script:
     - mkdir -p ./artifacts
   script:
     - go get -t ./...
-    - GOOS=${os} GOARCH=${arch} CGO_ENABLED=0
+    - GOOS=linux GOARCH=amd64 CGO_ENABLED=0
         go build
-          -o ./artifacts/webservice-${os}-${arch}
+          -o ./artifact.bin
           ./*.go
   artifacts:
     paths:
-      - ./artifacts
+      - ./artifact.bin
     expire_in: 10 sec
 
 
@@ -61,23 +53,24 @@ job_upload:
   rules:
     - if: $CI_COMMIT_REF_NAME =~ /stable/
       when: always
-  image: public.ecr.aws/lts/ubuntu:22.04
+  image: registry.hub.docker.com/library/docker:24.0.7
   tags:
     - docker-privileged
   dependencies:
     - job_build
-  before_script:
-    - apt update
-    - apt install -y
-        ca-certificates
-        curl
-    - update-ca-certificates
+  services:
+    # NOTE: when using a fully qualified image name, the 'alias' value must be
+    #       set to 'docker', because the DOCKER_HOST environment variable uses
+    #       'docker' as hostname; otherwise the job fails with '[...] no such host'
+    - name: registry.hub.docker.com/library/docker:24.0.7-dind
+      alias: docker
   script:
-    - |
-      for artifact in ./artifacts/*; do
-        chmod +x ${artifact}
-        curl \
-          --header "JOB-TOKEN: ${CI_JOB_TOKEN}" \
-          --upload-file ${artifact} \
-          "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/artifacts/${version}/"
-      done
+    - docker build
+        --file ./Containerfile
+        --build-arg binaryPath=./artifact.bin
+        --tag "${CI_REGISTRY_IMAGE}:${version}"
+        ./
+    - docker login -u ${CI_REGISTRY_USER} -p ${CI_REGISTRY_PASSWORD} ${CI_REGISTRY}
+    - docker push "${CI_REGISTRY_IMAGE}:${version}"
+  after_script:
+    - docker image rm --force "${CI_REGISTRY_IMAGE}:${version}"

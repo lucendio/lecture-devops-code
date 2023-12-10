@@ -1,0 +1,23 @@
+FROM mirror.gcr.io/library/golang:1.21 AS build
+
+WORKDIR /usr/local/src
+
+COPY ./ ./
+
+RUN go get -t ./...
+RUN \
+    CGO_ENABLED=0 \
+    GOOS=linux \
+    GOARCH=amd64 \
+    go build -v -o /artifact.bin ./*.go
+
+
+FROM scratch
+
+COPY --from=build /artifact.bin /bin/webservice
+
+ENV HOST 0.0.0.0
+
+ENTRYPOINT [ "/bin/webservice" ]
+CMD [ "" ]
+

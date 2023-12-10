@@ -1,0 +1,10 @@
+FROM scratch
+
+ARG binaryPath
+
+COPY ${binaryPath} /bin/webservice
+
+ENV HOST 0.0.0.0
+
+ENTRYPOINT [ "/bin/webservice" ]
+CMD [ "" ]
