@@ -46,7 +46,7 @@ job_build:
     - mkdir -p ./artifacts
   script:
     - go get -t ./...
-    - GOOS=${os} GOARCH=${arch}
+    - GOOS=${os} GOARCH=${arch} CGO_ENABLED=0
         go build
           -o ./artifacts/webservice-${os}-${arch}
           ./*.go
