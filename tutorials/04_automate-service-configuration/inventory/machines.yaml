@@ -1,0 +1,6 @@
+machines:
+  hosts:
+    instance1: {}
+  vars:
+    webservice_port: 8080
+    db_host: '127.0.0.1'

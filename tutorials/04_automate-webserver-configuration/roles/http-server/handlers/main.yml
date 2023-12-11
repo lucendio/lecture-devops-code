@@ -1,4 +1,0 @@
-- name: 'Reloading Nginx'
-  service:
-    name: nginx
-    state: reloaded

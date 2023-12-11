@@ -1,0 +1,37 @@
+- name: 'Build artifact locally on control host'
+  hosts: '127.0.0.1'
+  connection: 'local'
+  gather_facts: false
+  tasks:
+    - block:
+        - name: 'Create temporary folder'
+          ansible.builtin.tempfile:
+            state: 'directory'
+          register: 'tempfile_webservice_source'
+
+        - name: 'Clone webservice repository'
+          ansible.builtin.git:
+            repo: 'ssh://git@gitlab.bht-berlin.de/fb6-wp11-devops/webservice.git'
+            version: 'main'
+            dest: "{{ tempfile_webservice_source.path }}"
+
+        - name: 'Build artifact'
+          ansible.builtin.shell:
+            chdir: "{{ tempfile_webservice_source.path }}"
+            cmd: |
+              go get -t ./...
+              GOOS=linux GOARCH=amd64 CGO_ENABLED=0 \
+                go build \
+                  -o ./artifact.bin \
+                  ./*.go
+
+        - name: 'Move artifact to current workspace'
+          ansible.builtin.copy:
+            src: "{{ tempfile_webservice_source.path }}/artifact.bin"
+            dest: "{{ playbook_dir }}/artifact.bin"
+
+      always:
+        - name: 'Clean up'
+          ansible.builtin.file:
+            path: "{{ tempfile_webservice_source.path }}"
+            state: 'absent'

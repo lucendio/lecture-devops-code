@@ -1,0 +1,25 @@
+[Unit]
+Description={{ service_name }}
+
+Wants=network.target
+After=network-online.target
+
+
+[Service]
+TimeoutStartSec=0
+Restart=always
+
+Environment=\
+    {% if db_host | length >= 1 -%}
+    DB_HOST={{ db_host }} \
+    DB_PORT={{ db_port }} \
+    {% endif -%}
+    HOST=0.0.0.0 \
+    PORT={{ service_port }}
+
+
+ExecStart={{ executable_path }}
+
+
+[Install]
+WantedBy=multi-user.target

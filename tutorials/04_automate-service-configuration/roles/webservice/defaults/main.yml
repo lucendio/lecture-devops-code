@@ -1,0 +1,8 @@
+service_name: "{{ role_name }}"
+service_port: 3000
+
+executable_origin: "{{ mandatory }}"
+executable_checksum: ''
+
+db_host: ''
+db_port: 6379

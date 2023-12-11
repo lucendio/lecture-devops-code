@@ -1,0 +1,29 @@
+- hosts: 'machines'
+  become: true
+  tasks:
+    - ansible.builtin.package:
+        name: 'redis'
+        state: 'present'
+
+    - ansible.builtin.import_role:
+        name: 'webservice'
+      vars:
+        executable_origin: "{{ playbook_dir }}/artifact.bin"
+        service_port: "{{ webservice_port }}"
+
+
+- name: 'Verify results'
+  hosts: '127.0.0.1'
+  connection: 'local'
+  gather_facts: false
+  tasks:
+    - name: 'Check if webservice is responsive on all hosts'
+      delegate_to: '127.0.0.1'
+      loop: "{{ groups[ 'machines' ] | map( 'extract', hostvars ) }}"
+      loop_control: { label: "{{ item.inventory_hostname }}" }
+      ansible.builtin.uri:
+        url: "http://{{ item.ansible_host }}:{{ item.webservice_port }}/health"
+        timeout: 6
+      register: 'response'
+      failed_when:
+        - response.status != 200

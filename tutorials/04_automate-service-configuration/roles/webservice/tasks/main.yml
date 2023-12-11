@@ -1,0 +1,48 @@
+- block:
+    - when:
+        - executable_origin is not ansible.builtin.file
+        - executable_origin is not ansible.builtin.url
+      fail:
+        msg: 'value of executable_origin not supported'
+
+    - when: executable_origin is ansible.builtin.file
+      name: 'Install service from local file'
+      ansible.builtin.copy:
+        src: "{{ executable_origin }}"
+        dest: "{{ executable_path }}"
+        owner: 'root'
+        group: 'root'
+        mode: '711'
+      notify:
+        - 'Restart service'
+
+
+    - when: executable_origin is ansible.builtin.url
+      name: 'Install service from URL'
+      ansible.builtin.get_url:
+        url: "{{ executable_origin }}"
+        checksum: "{{ executable_checksum }}"
+        dest: "{{ executable_path }}"
+        owner: 'root'
+        group: 'root'
+        mode: '711'
+      notify:
+        - 'Restart service'
+
+
+- name: 'Configure service'
+  ansible.builtin.template:
+    src: 'service.unit.j2'
+    dest: "/etc/systemd/system/{{ service_name }}.service"
+    owner: 'root'
+    group: 'root'
+    mode: '644'
+  notify:
+    - 'Restart service'
+
+
+- name: 'Start service'
+  ansible.builtin.systemd_service:
+    name: "{{ service_name }}"
+    enabled: true
+    state: 'started'

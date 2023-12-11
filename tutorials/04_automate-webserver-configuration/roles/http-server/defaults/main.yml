@@ -1,4 +1,0 @@
-service_name: "{{ role_name }}"
-fqdn: '""'
-
-web_root_path: '/var/www/html'
