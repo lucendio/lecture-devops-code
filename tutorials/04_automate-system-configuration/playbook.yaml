@@ -1,9 +1,16 @@
 - hosts: 'machines'
   become: true
   tasks:
-    - ansible.builtin.package:
+    - name: 'Install Redis'
+      ansible.builtin.package:
         name: 'redis'
         state: 'present'
+
+    - name: 'Start Redis'
+      ansible.builtin.service:
+        name: 'redis'
+        enabled: true
+        state: 'started'
 
     - ansible.builtin.import_role:
         name: 'webservice'
@@ -18,7 +25,7 @@
   connection: 'local'
   gather_facts: false
   tasks:
-    - name: 'Check if webservice is responsive on all hosts'
+    - name: 'Check if webservice is operational'
       delegate_to: '127.0.0.1'
       loop: "{{ groups[ 'machines' ] | map( 'extract', hostvars ) }}"
       loop_control: { label: "{{ item.inventory_hostname }}" }
