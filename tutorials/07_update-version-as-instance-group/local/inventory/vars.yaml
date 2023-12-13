@@ -1,0 +1,6 @@
+all:
+  vars:
+    nginx_conf_path: '/etc/nginx/conf.d'
+
+    app_name: 'webservice'
+    domain: 'vagrant.local'

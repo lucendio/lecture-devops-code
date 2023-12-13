@@ -1,16 +1,5 @@
-# NOTE: necessary so that hostvars['database'] is set in the
-#       subsequent play
-- hosts:
-    - 'database'
-  gather_facts: yes
-  tasks: []
-
-
 - name: 'Create/Update service instances'
-  hosts:
-    - 'instance_group'
-  collections:
-    - 'ansible.builtin'
+  hosts: 'instance_group'
   # NOTE: two things are worth mentioning here
   #   * the 'rolling' deployment strategy is implemented by using 'serial: 1'
   #     DOCS: https://docs.ansible.com/ansible/latest/user_guide/playbooks_strategies.html
@@ -18,24 +7,18 @@
   #     new group on each deployment and at the end retire the old group
   serial: 1
   tasks:
-    - when: not disabled | default(False)
+    - when: not disabled | default( False )
       vars:
-        name: "{{ service_name }}-{{ inventory_hostname }}"
+        name: "{{ app_name }}-{{ inventory_hostname }}"
       block:
         - name: 'Configure instance'
           vars:
-            instance_name: "{{ name }}"
-            instance_port: "{{ port }}"
-            image_registry: 'quay.io'
-            image_repository: 'hedgedoc/hedgedoc'
-            image_tag: "{{ service_version | default('latest') }}"
-            postgres_host: >-
-              {{
-                hostvars['database'].ansible_facts.default_ipv4.address
-                | default(hostvars['database'].ansible_facts.all_ipv4_addresses[0])
-              }}
-          template:
-            src: 'myapp.unit.j2'
+            service_host: '127.0.0.1'
+            service_port: "{{ port }}"
+            db_host: '127.0.0.1'
+            db_port: 6379
+          ansible.builtin.template:
+            src: 'service.unit.j2'
             dest: "/etc/systemd/system/{{ name }}.service"
             owner: 'root'
             group: 'root'
@@ -43,80 +26,83 @@
           register: 'instance_unit'
 
         - name: '(Re)Start instance'
-          systemd:
+          ansible.builtin.systemd_service:
             name: "{{ name }}"
-            enabled: yes
-            state: "{{ 'restarted' if instance_unit.changed is defined and instance_unit.changed else 'started' }}"
-            daemon_reload: "{{ 'yes' if instance_unit.changed is defined and instance_unit.changed else 'no' }}"
+            enabled: true
+            state: >-
+              {{
+                'restarted'
+                  if instance_unit.changed | default( False )
+                else 'started'
+              }}
+            daemon_reload: >-
+              {{
+                'yes'
+                  if instance_unit.changed | default( False )
+                else 'no'
+              }}
 
-        - name: 'Verify the instance started successfully'
-          command: "systemctl is-active {{ name }}"
-          retries: 6
-          delay: 2
-          register: 'result'
-          until: result.stdout == "active"
-          changed_when: false
+        - name: 'Check if webservice is operational'
+          block:
+            - name: 'Verify if service started successfully'
+              command: "systemctl is-active {{ name }}"
+              retries: 6
+              delay: 2
+              register: 'result'
+              until: result.stdout == "active"
+              changed_when: false
 
-        - name: 'Verify the instance is available'
-          uri:
-            url: "http://127.0.0.1:{{ port }}"
-            timeout: 6
-          retries: 30
-          delay: 4
-          register: 'response'
-          until: response.status == 200
+            - name: 'Check if service is healthy'
+              ansible.builtin.uri:
+                url: "http://127.0.0.1:{{ port }}/health"
+                timeout: 6
+              register: 'response'
+              failed_when:
+                - response.status != 200
 
 
 - name: 'Poor mans service discovery'
-  hosts:
-    - 'lb'
-  gather_facts: yes
-  collections:
-    - 'ansible.builtin'
+  hosts: 'lb'
   tasks:
     - name: 'Reconfigure load balancer'
       vars:
         instance_ports: >-
           {{
-            groups['instance_group']
+            groups[ 'instance_group' ]
             | map('extract', hostvars )
-            | rejectattr('disabled', 'true')
-            | map(attribute='port')
+            | rejectattr( 'disabled', 'true' )
+            | map( attribute='port' )
           }}
       ansible.builtin.template:
         src: 'upstream.conf.j2'
-        dest: "{{ nginx_conf_path }}/{{ service_name | default('upstream') }}.conf"
+        dest: "{{ nginx_conf_path }}/{{ app_name | default('upstream') }}.conf"
         owner: 'root'
         group: 'root'
         mode: '644'
       notify:
-        - 'Reloading Nginx'
+        - 'Reload Nginx'
   handlers:
     - import_tasks: './tasks/reload-nginx.yaml'
 
 
 - name: 'Retire old/disabled instances'
-  hosts:
-    - 'instance_group'
-  gather_facts: yes
-  collections:
-    - 'ansible.builtin'
+  hosts: 'instance_group'
   tasks:
     - when: disabled | default(False)
       vars:
-        name: "{{ service_name }}-{{ inventory_hostname }}"
+        name: "{{ app_name }}-{{ inventory_hostname }}"
       block:
-        - name: 'Stop instance'
-          systemd:
+        - name: 'Stop and disable service'
+          ansible.builtin.systemd_service:
             name: "{{ name }}"
-            enabled: no
-            state: 'stopped'
+            enabled: false
+            state: stopped
           register: 'systemd_unit'
           failed_when:
             - systemd_unit.failed
             - '"Could not find the requested service" not in systemd_unit.msg'
 
-        - name: 'Remove instance configuration'
-          file:
+        - name: 'Remove service configuration'
+          ansible.builtin.file:
             path: "/etc/systemd/system/{{ name }}.service"
-            state: 'absent'
+            state: absent

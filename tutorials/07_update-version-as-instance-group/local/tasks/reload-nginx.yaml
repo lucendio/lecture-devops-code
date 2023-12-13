@@ -1,5 +1,5 @@
-- name: 'Reloading Nginx'
+- name: 'Reload Nginx'
   ansible.builtin.service:
-    name: nginx
-    enabled: yes
+    name: 'nginx'
+    enabled: true
     state: reloaded

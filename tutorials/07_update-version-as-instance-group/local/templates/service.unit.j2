@@ -1,0 +1,25 @@
+[Unit]
+Description={{ app_name }}
+
+Wants=network.target
+After=network-online.target
+
+
+[Service]
+TimeoutStartSec=0
+Restart=always
+
+Environment=\
+    {% if db_host | length >= 1 -%}
+    DB_HOST={{ db_host }} \
+    DB_PORT={{ db_port }} \
+    {% endif -%}
+    HOST={{ service_host }} \
+    PORT={{ service_port }}
+
+
+ExecStart=/usr/local/bin/webservice
+
+
+[Install]
+WantedBy=multi-user.target

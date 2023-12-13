@@ -14,7 +14,7 @@ Vagrant.configure("2") do |instance|
     if Vagrant.has_plugin?( "vagrant-hostmanager" )
         instance.hostmanager.enabled = true
         instance.hostmanager.manage_host = true
-        instance.hostmanager.manage_guest = true
+        instance.hostmanager.manage_guest = false
         instance.hostmanager.ignore_private_ip = false
     else
         raise "Vagrant Plugin 'HostManager' is required"
@@ -33,14 +33,14 @@ Vagrant.configure("2") do |instance|
     instance.vm.synced_folder "#{ DIR }", '/vagrant', disabled: true
 
     # NOTE: the Host-Manager plugin is required for this to have an effect
-    instance.vm.hostname = "pad.#{ DOMAIN }"
+    instance.vm.hostname = "machine1"
+    instance.hostmanager.aliases = [
+      "webservice.#{ DOMAIN }"
+    ]
 
     instance.vm.network 'private_network',
-                        ip: "10.0.11.22",
+                        ip: "10.0.42.23",
                         :adapter => 2
-
-    # INFO: expose HTTP port to access service via Nginx
-    instance.vm.network "forwarded_port", host: 8080, guest: 80
 
     # INFO: set up a user that can be used with Ansible
     instance.vm.provision "shell",
@@ -50,7 +50,7 @@ Vagrant.configure("2") do |instance|
                               useradd --shell /bin/bash --home-dir /home/#{ USERNAME } --no-user-group --expiredate '' --password 'p@sSw0rd' #{ USERNAME }
                               echo '#{ USERNAME } ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers
                               mkdir -p /home/#{ USERNAME }/.ssh
-                              echo '#{SSH_PUB_KEY}' >> /home/#{ USERNAME }/.ssh/authorized_keys
+                              echo '#{ SSH_PUB_KEY }' >> /home/#{ USERNAME }/.ssh/authorized_keys
                               chmod -R 700 /home/#{ USERNAME }/.ssh && chown -R #{ USERNAME }:#{ USERNAME } /home/#{ USERNAME }
                           SHELL
 

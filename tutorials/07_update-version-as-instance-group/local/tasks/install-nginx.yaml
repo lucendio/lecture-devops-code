@@ -1,17 +1,19 @@
-- name: 'Installing Nginx'
+- name: 'Install Nginx'
   ansible.builtin.package:
     name:
-      - nginx
+      - 'nginx'
     state: present
 
-- name: 'Disabling default vhost'
+- name: 'Disable default vhost'
   ansible.builtin.file:
     state: absent
     path: '/etc/nginx/sites-enabled/default'
   notify:
-    - 'Reloading Nginx'
+    - 'Reload Nginx'
 
-- name: 'Configuring custom vhost'
+- name: 'Configure custom vhost'
+  vars:
+    fqdn: "{{ app_name }}.{{ domain }}"
   ansible.builtin.template:
     src: 'vhost.conf.j2'
     dest: "{{ nginx_conf_path }}/{{ fqdn | default('vhost') }}.conf"
@@ -19,20 +21,20 @@
     group: 'root'
     mode: '644'
   notify:
-    - 'Reloading Nginx'
+    - 'Reload Nginx'
 
-- name: 'Define empty upstream, otherwise Nginx wont start'
+- name: 'Configure empty upstream'
   ansible.builtin.template:
     src: 'upstream.conf.j2'
-    dest: "{{ nginx_conf_path }}/{{ service_name | default('upstream') }}.conf"
+    dest: "{{ nginx_conf_path }}/{{ app_name | default('upstream') }}.conf"
     owner: 'root'
     group: 'root'
     mode: '644'
   notify:
-    - 'Reloading Nginx'
+    - 'Reload Nginx'
 
-- name: 'Starting Nginx'
+- name: 'Start Nginx'
   ansible.builtin.service:
-    name: nginx
-    enabled: yes
+    name: 'nginx'
+    enabled: true
     state: started

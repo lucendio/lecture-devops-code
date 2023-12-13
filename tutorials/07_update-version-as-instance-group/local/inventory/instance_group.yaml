@@ -1,17 +1,14 @@
 instance_group:
   hosts:
     aaa:
-      ansible_host: 'pad.vagrant.local'
+      ansible_host: 'machine1'
       port: '8081'
     bbb:
-      ansible_host: 'pad.vagrant.local'
+      ansible_host: 'machine1'
       port: '8082'
     ccc:
-      ansible_host: 'pad.vagrant.local'
+      ansible_host: 'machine1'
       port: '8083'
       # To destroy an instance, set
       #disabled: true
-  vars:
-    service_version: '1.9.2'
-
-
+  vars: {}
