@@ -1,0 +1,11 @@
+- name: 'Restart service'
+  block:
+    - ansible.builtin.stat:
+        path: "/etc/systemd/system/{{ service_name }}.service"
+      register: 'stat_systemd_unit'
+
+    - when: stat_systemd_unit.exists
+      ansible.builtin.systemd_service:
+        name: "{{ service_name }}"
+        state: restarted
+        daemon_reload: true
