@@ -1,4 +1,5 @@
 service_name: "{{ role_name }}"
+service_host: '127.0.0.1'
 service_port: 3000
 
 executable_origin: "{{ mandatory }}"

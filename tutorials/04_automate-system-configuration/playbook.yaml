@@ -9,6 +9,7 @@
         name: 'webservice'
       vars:
         executable_origin: "{{ playbook_dir }}/artifact.bin"
+        service_host: "{{ webservice_host }}"
         service_port: "{{ webservice_port }}"
 
 
