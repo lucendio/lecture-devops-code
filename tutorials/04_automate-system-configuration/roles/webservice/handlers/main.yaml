@@ -1,1 +1,13 @@
-- ansible.builtin.import_tasks: './../tasks/restart.yaml'
+- name: 'Read status of unit file'
+  listen: 'restarting'
+  ansible.builtin.stat:
+    path: "/etc/systemd/system/{{ service_name }}.service"
+  register: 'stat_systemd_unit'
+
+- when: stat_systemd_unit.stat.exists
+  name: 'Restart service'
+  listen: 'restarting'
+  ansible.builtin.systemd_service:
+    name: "{{ service_name }}"
+    state: restarted
+    daemon_reload: true

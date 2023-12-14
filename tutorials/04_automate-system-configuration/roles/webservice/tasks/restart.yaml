@@ -2,7 +2,6 @@
   ansible.builtin.stat:
     path: "/etc/systemd/system/{{ service_name }}.service"
   register: 'stat_systemd_unit'
-  listen: 'restarting'
 
 - when: stat_systemd_unit.stat.exists
   name: 'Restart service'
@@ -10,4 +9,3 @@
     name: "{{ service_name }}"
     state: restarted
     daemon_reload: true
-  listen: 'restarting'
