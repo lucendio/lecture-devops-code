@@ -1,0 +1,21 @@
+- name: 'Retire old/disabled instances'
+  hosts: 'instance_group'
+  tasks:
+    - when: disabled | default(False)
+      vars:
+        name: "{{ app_name }}-{{ inventory_hostname }}"
+      block:
+        - name: 'Stop and disable service'
+          ansible.builtin.systemd_service:
+            name: "{{ name }}"
+            enabled: false
+            state: stopped
+          register: 'systemd_unit'
+          failed_when:
+            - systemd_unit.failed
+            - '"Could not find the requested service" not in systemd_unit.msg'
+
+        - name: 'Remove service configuration'
+          ansible.builtin.file:
+            path: "/etc/systemd/system/{{ name }}.service"
+            state: absent

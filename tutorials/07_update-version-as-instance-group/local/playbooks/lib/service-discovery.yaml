@@ -1,0 +1,22 @@
+- name: 'Poor mans service discovery'
+  hosts: 'lb'
+  tasks:
+    - name: 'Reconfigure load balancer'
+      vars:
+        instance_ports: >-
+          {{
+            groups[ 'instance_group' ]
+            | map('extract', hostvars )
+            | rejectattr( 'disabled', 'true' )
+            | map( attribute='port' )
+          }}
+      ansible.builtin.template:
+        src: './../../templates/upstream.conf.j2'
+        dest: "{{ nginx_conf_path }}/{{ app_name | default('upstream') }}.conf"
+        owner: 'root'
+        group: 'root'
+        mode: '644'
+      notify:
+        - 'Reload Nginx'
+  handlers:
+    - import_tasks: './../../tasks/reload-nginx.yaml'

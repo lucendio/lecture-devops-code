@@ -14,6 +14,9 @@ Environment=\
     DB_HOST={{ db_host }} \
     DB_PORT={{ db_port }} \
     {% endif -%}
+    {% if font_color is defined -%}
+    FONT_COLOR={{ font_color }} \
+    {% endif -%}
     HOST={{ service_host }} \
     PORT={{ service_port }}
 

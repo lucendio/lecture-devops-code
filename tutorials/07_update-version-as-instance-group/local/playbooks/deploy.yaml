@@ -1,0 +1,60 @@
+- name: 'Create/Update service instances'
+  hosts: 'instance_group'
+  tasks:
+    - when: not disabled | default( False )
+      vars:
+        name: "{{ app_name }}-{{ inventory_hostname }}"
+      block:
+        - name: 'Configure instance'
+          vars:
+            service_host: '127.0.0.1'
+            service_port: "{{ port }}"
+            db_host: '127.0.0.1'
+            db_port: 6379
+          ansible.builtin.template:
+            src: './../templates/service.unit.j2'
+            dest: "/etc/systemd/system/{{ name }}.service"
+            owner: 'root'
+            group: 'root'
+            mode: '644'
+          register: 'instance_unit'
+
+        - name: '(Re)Start instance'
+          ansible.builtin.systemd_service:
+            name: "{{ name }}"
+            enabled: true
+            state: >-
+              {{
+                'restarted'
+                  if instance_unit.changed | default( False )
+                else 'started'
+              }}
+            daemon_reload: >-
+              {{
+                'yes'
+                  if instance_unit.changed | default( False )
+                else 'no'
+              }}
+
+        - name: 'Check if webservice is operational'
+          block:
+            - name: 'Verify if service started successfully'
+              command: "systemctl is-active {{ name }}"
+              retries: 6
+              delay: 2
+              register: 'result'
+              until: result.stdout == "active"
+              changed_when: false
+
+            - name: 'Check if service is healthy'
+              ansible.builtin.uri:
+                url: "http://127.0.0.1:{{ port }}/health"
+                timeout: 6
+              register: 'response'
+              failed_when:
+                - response.status != 200
+
+
+- ansible.builtin.import_playbook: './lib/service-discovery.yaml'
+
+- ansible.builtin.import_playbook: './lib/retire-instances.yaml'

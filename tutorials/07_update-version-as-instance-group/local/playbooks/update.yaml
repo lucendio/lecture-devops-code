@@ -18,7 +18,7 @@
             db_host: '127.0.0.1'
             db_port: 6379
           ansible.builtin.template:
-            src: 'service.unit.j2'
+            src: './../templates/service.unit.j2'
             dest: "/etc/systemd/system/{{ name }}.service"
             owner: 'root'
             group: 'root'
@@ -60,49 +60,11 @@
               failed_when:
                 - response.status != 200
 
-
-- name: 'Poor mans service discovery'
-  hosts: 'lb'
-  tasks:
-    - name: 'Reconfigure load balancer'
-      vars:
-        instance_ports: >-
-          {{
-            groups[ 'instance_group' ]
-            | map('extract', hostvars )
-            | rejectattr( 'disabled', 'true' )
-            | map( attribute='port' )
-          }}
-      ansible.builtin.template:
-        src: 'upstream.conf.j2'
-        dest: "{{ nginx_conf_path }}/{{ app_name | default('upstream') }}.conf"
-        owner: 'root'
-        group: 'root'
-        mode: '644'
-      notify:
-        - 'Reload Nginx'
-  handlers:
-    - import_tasks: './tasks/reload-nginx.yaml'
+        - name: 'Delay to demonstrate sequential update'
+          ansible.builtin.pause:
+            seconds: 2
 
 
-- name: 'Retire old/disabled instances'
-  hosts: 'instance_group'
-  tasks:
-    - when: disabled | default(False)
-      vars:
-        name: "{{ app_name }}-{{ inventory_hostname }}"
-      block:
-        - name: 'Stop and disable service'
-          ansible.builtin.systemd_service:
-            name: "{{ name }}"
-            enabled: false
-            state: stopped
-          register: 'systemd_unit'
-          failed_when:
-            - systemd_unit.failed
-            - '"Could not find the requested service" not in systemd_unit.msg'
+- ansible.builtin.import_playbook: './lib/service-discovery.yaml'
 
-        - name: 'Remove service configuration'
-          ansible.builtin.file:
-            path: "/etc/systemd/system/{{ name }}.service"
-            state: absent
+- ansible.builtin.import_playbook: './lib/retire-instances.yaml'
