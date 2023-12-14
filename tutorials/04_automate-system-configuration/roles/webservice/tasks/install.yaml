@@ -13,7 +13,7 @@
     group: 'root'
     mode: '711'
   notify:
-    - 'Restart service'
+    - 'restarting'
 
 - when: executable_origin is ansible.builtin.url
   name: 'Install service from URL'
@@ -25,4 +25,4 @@
     group: 'root'
     mode: '711'
   notify:
-    - 'Restart service'
+    - 'restarting'
