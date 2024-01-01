@@ -1,20 +1,18 @@
 apiVersion: 'networking.k8s.io/v1'
 kind: 'Ingress'
 metadata:
-  name: 'etherpad-ingress'
+  name: 'webservice-ingress'
   annotations:
-    # NOTE: enable session affinity to make websockets work for deployments with replica > 1
-    nginx.ingress.kubernetes.io/affinity: 'cookie'
-    nginx.ingress.kubernetes.io/session-cookie-name: 'express_sid'
+    kubernetes.io/ingress.class: 'nginx'
 spec:
   rules:
   - host: ${NAME}.lehre.ris.bht-berlin.de
     http:
       paths:
-      - pathType: ImplementationSpecific
+      - pathType: Prefix
         path: '/'
         backend:
           service:
-            name: etherpad-service
+            name: webservice-service
             port:
               number: 80

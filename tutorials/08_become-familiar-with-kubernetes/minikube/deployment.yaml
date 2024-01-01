@@ -1,28 +1,24 @@
-# NOTE: this deployment configuration is a minimal version. It's missing parts like
-#  * probes for health checking
-#  * security context
-
 apiVersion: 'apps/v1'
 kind: 'Deployment'
 metadata:
-  name: 'etherpad-deployment'
+  name: 'webservice-deployment'
 spec:
   selector:
     matchLabels:
-      app: 'etherpad'
-  replicas: 2
+      app: 'webservice'
+  replicas: 3
   strategy:
     type: 'RollingUpdate'
   template:
     metadata:
       labels:
-        app: 'etherpad'
+        app: 'webservice'
     spec:
       securityContext:
         runAsNonRoot: true
       containers:
-      - name: etherpad-lite
-        image: docker.io/etherpad/etherpad:stable
+      - name: webservice-in-memory
+        image: registry.bht-berlin.de:443/fb6-wp11-devops/webservice
         env:
           - name: 'PORT'
             value: '8080'
@@ -38,12 +34,12 @@ spec:
             memory: '256Mi'
         securityContext:
           allowPrivilegeEscalation: false
-          # See https://github.com/ether/etherpad-lite/blob/020f5ff730bf1c9905ded4e6fde45c35d60cc63c/Dockerfile#L27
-          runAsUser: 5001
+          # NOTE: user 'nobody' in Ubuntu base image
+          runAsUser: 65534
         livenessProbe:
           tcpSocket:
             port: primary
         readinessProbe:
           httpGet:
-            path: '/stats'
+            path: '/health'
             port: primary
