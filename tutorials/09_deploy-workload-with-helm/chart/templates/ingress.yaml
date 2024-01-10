@@ -9,12 +9,14 @@ metadata:
     {{- toYaml . | nindent 4 }}
   {{- end }}
 spec:
+  {{- if .Values.enableTLS }}
   tls:
     - hosts:
-      - {{ required "ERROR: fqdn required!" .Values.fqdn }}
+        - {{ default ( printf "%s.lehre.ris.bht-berlin.de" .Release.Namespace ) .Values.fqdn }}
       secretName: '{{ default ( printf "%s-tls" (include "chart.fullname" .) ) .Values.tlsCertificateSecretName }}'
+  {{- end }}
   rules:
-    - host: {{ .Values.fqdn }}
+    - host: {{ default ( printf "%s.lehre.ris.bht-berlin.de" .Release.Namespace ) .Values.fqdn }}
       http:
         paths:
         - pathType: Prefix
@@ -23,4 +25,4 @@ spec:
             service:
               name: {{ include "chart.fullname" . }}
               port:
-                number: {{ .Values.service.port}}
+                number: {{ .Values.service.port }}

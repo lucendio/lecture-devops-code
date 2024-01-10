@@ -16,33 +16,39 @@ spec:
       labels:
         {{- include "chart.selectorLabels" . | nindent 8 }}
     spec:
+      {{- if .Values.enablePersistence }}
+      volumes:
+        - name: vol-db-password
+          secret:
+            secretName: '{{ include "chart.fullname" . }}-db-credentials'
+      {{- end }}
       securityContext:
-        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+        {{- toYaml .Values.securityContext | nindent 8 }}
       containers:
         - name: {{ .Chart.Name }}
-          securityContext:
-            {{- toYaml .Values.securityContext | nindent 12 }}
-          image: "{{ .Values.image.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          image: "{{ .Values.image.registry }}/{{ .Values.image.repository }}{{ .Values.image.tag | default .Chart.AppVersion }}"
           {{- if .Values.image.pullPolicy }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           {{- end }}
+          {{- if .Values.enablePersistence }}
+          volumeMounts:
+            - mountPath: '/etc/db-creds'
+              name: vol-db-password
+              readOnly: true
+          {{- end }}
           env:
-            - name: 'CMD_DOMAIN'
-              value: {{ .Values.fqdn | quote }}
-            - name: 'CMD_PORT'
-              value: {{ .Values.port | quote }}
-            - name: 'CMD_DB_URL'
-              value: >-
-                postgres://
-                {{- .Values.postgresql.auth.username -}}
-                :
-                {{- .Values.postgresql.auth.password -}}
-                @
-                {{- .Values.postgresql.fullnameOverride -}}
-                :
-                {{- .Values.postgresql.service.ports.postgresql -}}
-                /
-                {{- .Values.postgresql.auth.database -}}
+            - name: 'ENV_NAME'
+              value: '{{ .Values.environment }}'
+            - name: 'HOST'
+              value: '0.0.0.0'
+            - name: 'PORT'
+              value: '{{ .Values.port }}'
+        {{- if .Values.enablePersistence }}
+            - name: 'DB_HOST'
+              value: 'redis-master.{{ .Release.Namespace }}.svc'
+            - name: 'DB_PASSWORD'
+              value: '/etc/db-creds/password.txt'
+        {{- end }}
         {{- range $key, $value := .Values.envVars }}
             - name: {{ $key }}
               value: {{ $value | quote }}
@@ -53,24 +59,12 @@ spec:
               protocol: TCP
           livenessProbe:
             failureThreshold: 3
-            httpGet:
-              path: /status
+            tcpSocket:
               port: primary
           readinessProbe:
             failureThreshold: 3
             httpGet:
-              path: /status
+              path: /health
               port: primary
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
-          volumeMounts:
-            - mountPath: /home/hackmd/app/public/uploads
-              name: uploads
-      volumes:
-        - name: uploads
-          {{- if .Values.enablePersistence }}
-          persistentVolumeClaim:
-            claimName: '{{ include "chart.fullname" . }}-uploads'
-          {{- else }}
-          emptyDir: {}
-          {{- end }}

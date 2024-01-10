@@ -1,4 +1,12 @@
 image:
-  tag: '2.4.2'
+  tag: ':scratch'
 
 replicaCount: 3
+
+enableTLS: true
+ingress:
+  annotations:
+    # NOTE: enable automated TLS certificate issuing via ACME protocol
+    cert-manager.io/cluster-issuer: 'sectigo-ris'
+
+enablePersistence: true
