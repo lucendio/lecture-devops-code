@@ -1,25 +1,26 @@
 data "aws_ami" "image" {
-  # NOTE: prevent multiple images from to occurring in the result
+  # NOTE: prevent multiple images from to occurring in the result,
+  #       but keep in mind that this makes the result not reproducible,
+  #       because at some point in the future a newer build matching the
+  #       same filter values will occur
   most_recent = true
 
-  owners = ["099720109477"]
+  # NOTE: AWS Academy only allows to start machines based on their own images
+  owners = ["amazon"]
 
   filter {
     name = "name"
-    values = [
-      "ubuntu/images/*",
-    ]
+    values = ["*ubuntu*"]
   }
 
   filter {
     name = "name"
-    values = ["*20.04*"]
+    values = ["*22.04*"]
   }
 
-  # NOTE: pin image by setting release date
   filter {
     name = "name"
-    values = ["*20210105"]
+    values = ["*amd64-server*"]
   }
 
   filter {

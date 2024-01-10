@@ -18,7 +18,7 @@ output "hosts" {
       )
     }
 
-    kube-master = {
+    kube_control_plane = {
       hosts = { for name, _ in aws_instance.controlplane : name => {} }
       vars = {
         # NOTE: ensure that the x509 cert used in KUBECONFIG also includes all control-plane machines
@@ -30,7 +30,7 @@ output "hosts" {
       hosts = { for name, _ in aws_instance.controlplane : name => {} }
     }
 
-    kube-node = {
+    kube_node = {
       hosts = { for name, _ in aws_instance.nodes : name => {} }
     }
   }

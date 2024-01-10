@@ -2,15 +2,15 @@ all:
   vars:
     artifacts_dir: "{{ inventory_dir }}/../"
 
-k8s-cluster:
+k8s_cluster:
   vars:
     kube_version: v1.20.2
     container_manager: 'containerd'
     kubeconfig_localhost: true
     dashboard_enabled: true
   children:
-    kube-master: {}
-    kube-node: {}
+    kube_master: {}
+    kube_node: {}
 
 etcd:
   vars:
