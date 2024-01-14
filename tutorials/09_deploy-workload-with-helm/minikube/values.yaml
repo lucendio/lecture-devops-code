@@ -1,4 +1,8 @@
 image:
-  tag: '2.4.2'
+  tag: ':scratch'
 
 replicaCount: 3
+
+enableTLS: true
+
+enablePersistence: true
