@@ -1,0 +1,73 @@
+nameOverride: ""
+fullnameOverride: ""
+
+enablePersistence: &persistenceIs false
+
+tlsCertificateSecretName: null
+
+image:
+  registry: 'docker.io'
+  repository: 'hackmdio/hackmd'
+  tag: 'latest'
+
+replicaCount: 1
+port: 3000
+
+# NOTE: may be provided via command line option
+fqdn: null
+
+envVars:
+  CMD_USECDN: 'false'
+  CMD_PROTOCOL_USESSL: 'true'
+  CMD_ALLOW_ANONYMOUS: 'true'
+  CMD_ALLOW_ANONYMOUS_VIEWS: 'true'
+  CMD_ALLOW_ANONYMOUS_EDITS: 'true'
+  CMD_DEFAULT_PERMISSION: 'freely'
+
+resources:
+  requests:
+    cpu: 256m
+    memory: 256Mi
+  limits:
+    cpu: 512m
+    memory: 512Mi
+
+podSecurityContext: {}
+
+securityContext:
+  allowPrivilegeEscalation: false
+  privileged: false
+  # REF: https://github.com/hackmdio/docker-buildpack/blob/2d998b0c7300cd4c57f546a82dfa9a0d174fcc50/runtime/Dockerfile#L6
+  runAsUser: 1500
+  capabilities:
+    drop:
+      - ALL
+
+
+service:
+  type: ClusterIP
+  port: 80
+
+
+ingress:
+  enabled: true
+  annotations:
+    # NOTE: enable session affinity to make websockets work for deployments with replica > 1
+    nginx.ingress.kubernetes.io/affinity: 'cookie'
+
+
+postgresql:
+  fullnameOverride: 'postgres'
+  image:
+    registry: 'docker.io'
+    repository: 'bitnami/postgresql'
+    tag: '13.1.0'
+  service:
+    ports:
+      postgresql: 5432
+  auth:
+    database: 'my-db'
+  primary:
+    persistence:
+      enabled: *persistenceIs
+      existingClaim: 'pvc-db'

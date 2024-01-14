@@ -1,0 +1,12 @@
+apiVersion: v2
+name: codimd
+version: '0.1.0'
+description: A Helm chart to deploy CodiMD on Kubernetes
+
+type: application
+appVersion: '2.3.2'
+
+dependencies:
+  - name: postgresql
+    version: '12.5.8'
+    repository: https://charts.bitnami.com/bitnami
