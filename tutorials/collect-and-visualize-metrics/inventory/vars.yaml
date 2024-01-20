@@ -1,0 +1,13 @@
+all:
+  vars:
+    emitter_bind_ip: '0.0.0.0'
+    emitter_bind_post: 9100
+    emitter_metrics_path: '/metrics'
+
+    collector_bind_ip: '127.0.0.1'
+    collector_bind_port: 9090
+
+    visualizer_bind_ip: "{{ ansible_host }}"
+    visualizer_bind_port: 3000
+    visualizer_web_console_username: 'operator'
+    visualizer_web_console_password: 'P@ssw0rd'

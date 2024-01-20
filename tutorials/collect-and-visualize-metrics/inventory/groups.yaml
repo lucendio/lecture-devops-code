@@ -1,0 +1,19 @@
+all:
+  children:
+
+    emitters:
+      hosts:
+        machine: {}
+      vars: {}
+
+    collectors:
+      hosts:
+        machine: {}
+      vars: {}
+
+    visualizers:
+      hosts:
+        machine: {}
+      vars: {}
+
+

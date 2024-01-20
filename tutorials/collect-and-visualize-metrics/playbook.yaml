@@ -1,0 +1,44 @@
+- hosts: 'emitters'
+  tasks:
+    - ansible.builtin.import_role:
+        name: 'prometheus.prometheus.node_exporter'
+      vars:
+        node_exporter_web_listen_address: "{{ emitter_bind_ip }}:{{ emitter_bind_post }}"
+        node_exporter_web_telemetry_path: "{{ emitter_metrics_path }}"
+
+- hosts: 'collectors'
+  tasks:
+    - ansible.builtin.import_role:
+        name: 'prometheus.prometheus.prometheus'
+      vars:
+        prometheus_web_listen_address: "{{ collector_bind_ip }}:{{ collector_bind_port }}"
+        prometheus_global:
+          evaluation_interval: 10s
+        prometheus_scrape_configs:
+          - job_name: 'node'
+            scrape_interval: 5s
+            scrape_timeout: 5s
+            metrics_path: "{{ emitter_metrics_path }}"
+            static_configs:
+              - targets:
+                  - "{{ emitter_bind_ip }}:{{ emitter_bind_post }}"
+
+- hosts: 'visualizers'
+  tasks:
+    - ansible.builtin.import_role:
+        name: 'grafana.grafana.grafana'
+      vars:
+        grafana_address: "{{ visualizer_bind_ip }}"
+        grafana_port: "{{ visualizer_bind_port }}"
+        grafana_security:
+          admin_user: "{{ visualizer_web_console_username }}"
+          admin_password: "{{ visualizer_web_console_password }}"
+        grafana_datasources:
+          - name: &datasource_name 'Node-Exporter'
+            type: prometheus
+            url: "http://{{ collector_bind_ip }}:{{ collector_bind_port }}"
+            access: proxy
+        grafana_dashboards:
+          - dashboard_id: 1860
+            revision_id: 33
+            datasource: *datasource_name

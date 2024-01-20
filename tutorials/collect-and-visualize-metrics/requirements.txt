@@ -1,0 +1,2 @@
+# NOTE: dependency of the Grafana collection
+jmespath >= 1.0, < 2.0

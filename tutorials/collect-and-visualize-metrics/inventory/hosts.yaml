@@ -1,0 +1,4 @@
+all:
+  hosts:
+    machine:
+      ansible_host: '10.0.42.23'

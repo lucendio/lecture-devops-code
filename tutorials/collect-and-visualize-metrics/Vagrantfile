@@ -1,0 +1,48 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+
+DIR = File.dirname(__FILE__)
+
+SSH_PUB_KEY = File.read( "#{ DIR }/.ssh/operator.pub" )
+USERNAME = 'operator'
+
+
+Vagrant.configure("2") do |instance|
+
+    instance.vm.box = 'ubuntu/jammy64'
+
+    instance.vm.provider "virtualbox" do |vb|
+        vb.name = 'machine'
+        vb.gui = false
+        vb.cpus = 1
+        vb.memory = "1024"
+    end
+
+    instance.vm.synced_folder "#{ DIR }", '/vagrant', disabled: true
+
+    instance.vm.network 'private_network',
+                        ip: "10.0.42.23",
+                        :adapter => 2
+
+    # INFO: set up a user that can be used with Ansible
+    instance.vm.provision "shell",
+                          privileged: true,
+                          inline: <<-SHELL
+                              groupadd --force #{ USERNAME }
+                              useradd --shell /bin/bash --home-dir /home/#{ USERNAME } --no-user-group --expiredate '' --password 'p@sSw0rd' #{ USERNAME }
+                              echo '#{ USERNAME } ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers
+                              mkdir -p /home/#{ USERNAME }/.ssh
+                              echo '#{ SSH_PUB_KEY }' >> /home/#{ USERNAME }/.ssh/authorized_keys
+                              chmod -R 700 /home/#{ USERNAME }/.ssh && chown -R #{ USERNAME }:#{ USERNAME } /home/#{ USERNAME }
+                          SHELL
+
+    # INFO: make sure Ansible requirements are met
+    instance.vm.provision "shell",
+                          privileged: true,
+                          inline: <<-SHELL
+                              apt update
+                              apt install -y \
+                                  python3
+                          SHELL
+end
