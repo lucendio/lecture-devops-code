@@ -591,8 +591,52 @@ returnCode=$?
 
 
 
-# ASSERT: one single line containing 'var csrfToken = {...}'
-readonly line="$(echo "${response}" | grep 'var csrfToken')"
+readonly vocareumLaunchFormUrl=$(echo "${response}" \
+    | xmllint \
+        --xpath "string(//form[@id='authorization_redirect_form']/@action)" \
+        --html \
+    - 2>/dev/null \
+)
+readonly inputCountLaunch=$( \
+    echo "${response}" \
+        | xmllint \
+            --xpath "count(//form[@id='authorization_redirect_form']/input[@type='hidden'])" \
+            --html \
+        - 2>/dev/null \
+)
+launchFormData=()
+for (( i=1; i<=${inputCountLaunch}; i++ )); do
+    inputName=$(echo "${response}" \
+    | xmllint \
+        --xpath "string(//form[@id='authorization_redirect_form']/input[@type='hidden' and position()=${i}]/@name)" \
+        --html \
+    - 2>/dev/null)
+    inputValue=$(echo "${response}" \
+    | xmllint \
+        --xpath "string(//form[@id='authorization_redirect_form']/input[@type='hidden' and position()=${i}]/@value)" \
+        --html \
+    - 2>/dev/null)
+
+    launchFormData+=('--data-urlencode')
+    launchFormData+=("${inputName}=${inputValue}")
+done
+
+(${DEBUG_ENABLED} && echo " [DEBUG] Submitting Vocareum Launch form")
+response=$( \
+    curl \
+        "${CURL_OPTIONS[@]}" \
+        \
+        "${launchFormData[@]}" \
+        \
+        "${vocareumLaunchFormUrl}" \
+)
+returnCode=$?
+(${VERBOSE_ENABLED} && echo "${response}" > "${SELF_DIR}/09_VocareumLaunchFormSubmit.log.html")
+
+
+
+# ASSERT: one single line containing 'main.php'
+readonly line="$(echo "${response}" | grep 'main.php')"
 returnCode=$?
 if [[ "${returnCode}" != "0" ]]; then
     echo " [ERROR] Assertion not correct anymore" >&2
