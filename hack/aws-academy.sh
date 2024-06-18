@@ -198,7 +198,7 @@ function getLabStatus() {
             "${statusURL}" \
     )
     local -r returnCode=$?
-    (${VERBOSE_ENABLED} && echo "${response}" > "${SELF_DIR}/09_LabStatus.log.txt")
+    (${VERBOSE_ENABLED} && touch "${SELF_DIR}/10_LabStatus.log.txt" && echo "${response}" >> "${SELF_DIR}/10_LabStatus.log.txt")
 
     case "${response}" in
         *'creation'* )
@@ -282,7 +282,7 @@ function obtainAWSCredentials() {
     )
     local -r returnCode=$?
 
-    (${VERBOSE_ENABLED} && echo "${response}" > "${SELF_DIR}/10_obtainAWSCredentials.log.txt")
+    (${VERBOSE_ENABLED} && echo "${response}" > "${SELF_DIR}/11_obtainAWSCredentials.log.txt")
 
     local -r keyId=$(extractValue "${response}" 'aws_access_key_id')
     local -r accessKey=$(extractValue "${response}" 'aws_secret_access_key')
