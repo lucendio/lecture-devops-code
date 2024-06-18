@@ -581,7 +581,6 @@ done
 response=$( \
     curl \
         "${CURL_OPTIONS[@]}" \
-        --request POST \
         \
         "${formData[@]}" \
         \
