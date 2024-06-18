@@ -549,14 +549,14 @@ returnCode=$?
 
 readonly vocareumFormUrl=$(echo "${response}" \
     | xmllint \
-        --xpath "string(//form[@id='tool_form']/@action)" \
+        --xpath "string(//form[contains(@id,'tool_form')]/@action)" \
         --html \
     - 2>/dev/null \
 )
 readonly inputCount=$( \
     echo "${response}" \
         | xmllint \
-            --xpath 'count(//form[@id="tool_form"]/input[@type="hidden"])' \
+            --xpath "count(//form[contains(@id,'tool_form')]/input[@type='hidden'])" \
             --html \
         - 2>/dev/null \
 )
@@ -564,12 +564,12 @@ formData=()
 for (( i=1; i<=${inputCount}; i++ )); do
     inputName=$(echo "${response}" \
     | xmllint \
-        --xpath "string(//form[@id='tool_form']/input[@type='hidden' and position()=${i}]/@name)" \
+        --xpath "string(//form[contains(@id,'tool_form')]/input[@type='hidden' and position()=${i}]/@name)" \
         --html \
     - 2>/dev/null)
     inputValue=$(echo "${response}" \
     | xmllint \
-        --xpath "string(//form[@id='tool_form']/input[@type='hidden' and position()=${i}]/@value)" \
+        --xpath "string(//form[contains(@id,'tool_form')]/input[@type='hidden' and position()=${i}]/@value)" \
         --html \
     - 2>/dev/null)
 
