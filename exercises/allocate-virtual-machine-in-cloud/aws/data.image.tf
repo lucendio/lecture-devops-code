@@ -10,12 +10,19 @@ data "aws_ami" "image" {
 
   filter {
     name = "name"
-    values = ["*ubuntu*"]
+    values = ["*ubuntu/image*"]
   }
 
   filter {
     name = "name"
-    values = ["*22.04*"]
+    values = ["*24.04*"]
+  }
+
+  # NOTE: related to the note about ''most_recent', the next filter make the
+  #       result reproducible. How? The year/month combination has past
+  filter {
+    name = "name"
+    values = ["*202411*"]
   }
 
   filter {

@@ -5,9 +5,7 @@ resource "aws_key_pair" "ssh" {
 
 resource "aws_instance" "vm" {
   instance_type = "t2.nano"
-  ami = "ami-0a5f04cdf7758e9f0"
-
-  count = 10
+  ami = data.aws_ami.image.id
 
   key_name = aws_key_pair.ssh.key_name
 
