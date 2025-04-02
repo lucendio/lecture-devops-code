@@ -10,7 +10,7 @@ USERNAME = 'operator'
 
 Vagrant.configure("2") do |instance|
 
-    instance.vm.box = 'ubuntu/jammy64'
+    instance.vm.box = 'bento/ubuntu-24.04'
 
     instance.vm.provider "virtualbox" do |vb|
         vb.name = 'my-machine'
