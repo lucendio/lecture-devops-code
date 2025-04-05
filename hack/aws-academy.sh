@@ -175,7 +175,7 @@ function checkIfLoggedIn() {
     #local -r teacher=$?
     #echo "${response}" | grep -q "${AWSACADEMY_INSTRUCTURE_STUDENT_LOGIN_URL}"
     #local -r student=$?
-    echo "${response}" | grep -p 'user authorization required'
+    echo "${response}" | grep -q 'user authorization required'
     local -r status=$?
     if [[ "${status}" -eq "0" ]]; then
         return 1
