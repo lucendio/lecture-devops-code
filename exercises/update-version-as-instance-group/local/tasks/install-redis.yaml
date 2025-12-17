@@ -1,3 +1,22 @@
+- name: 'Redis directories exist'
+  loop:
+    - "{{ redis_config_dir }}"
+    - "{{ redis_state_dir }}"
+  ansible.builtin.file:
+    state: 'directory'
+    path: "{{ item }}"
+    owner: 'root'
+    mode: '0755'
+
+- name: 'Set Redis configuration'
+  vars:
+    password: "{{ database_password }}"
+    state_dir: "{{ redis_state_dir }}"
+  ansible.builtin.template:
+    src: './../templates/redis.conf.j2'
+    dest: "{{ redis_config_dir }}/redis.conf"
+    mode: '0644'
+
 - name: 'Install Redis'
   ansible.builtin.package:
     name: 'redis'

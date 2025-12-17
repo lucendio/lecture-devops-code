@@ -5,6 +5,16 @@
         tasks_from: 'install'
       vars:
         executable_origin: "{{ playbook_dir }}/../artifact.bin"
+    - name: 'Configuration directory exists'
+      ansible.builtin.file:
+        state: 'directory'
+        path: "{{ app_config_dir }}"
+        mode: '0755'
+    - name: 'Database password file exists'
+      ansible.builtin.copy:
+        content: "{{ database_password }}"
+        dest: "{{ app_db_password_file_path }}"
+        mode: '0600'
 
 - hosts: 'backing_services'
   tasks:

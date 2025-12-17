@@ -17,6 +17,7 @@
             service_port: "{{ port }}"
             db_host: '127.0.0.1'
             db_port: 6379
+            db_password_file_path: "{{ app_db_password_file_path }}"
           ansible.builtin.template:
             src: './../templates/service.unit.j2'
             dest: "/etc/systemd/system/{{ name }}.service"

@@ -2,5 +2,12 @@ all:
   vars:
     nginx_conf_path: '/etc/nginx/conf.d'
 
+    redis_state_dir: '/var/redis'
+    redis_config_dir: '/etc/redis'
+
+    database_password: 'sensitive-information-must-be-encrypted'
+
     app_name: 'webservice'
+    app_config_dir: "/etc/{{ app_name }}"
+    app_db_password_file_path: "{{ app_config_dir }}/db-password.txt"
     domain: 'vagrant.local'
