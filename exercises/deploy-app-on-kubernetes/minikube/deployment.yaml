@@ -18,7 +18,7 @@ spec:
         runAsNonRoot: true
       containers:
       - name: webservice-in-memory
-        image: registry.bht-berlin.de:443/fb6-wp11-devops/webservice
+        image: registry.bht-berlin.de:443/fb6-wp11-devops/artifacts/webservice
         env:
           - name: 'PORT'
             value: '8080'
