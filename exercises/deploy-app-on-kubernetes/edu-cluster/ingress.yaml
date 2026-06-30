@@ -2,11 +2,10 @@ apiVersion: 'networking.k8s.io/v1'
 kind: 'Ingress'
 metadata:
   name: 'webservice-ingress'
-  annotations:
-    kubernetes.io/ingress.class: 'nginx'
 spec:
+  ingressClassName: 'nginx'
   rules:
-  - host: webservice.gjahn-tutorials.lehre.ris.bht-berlin.de
+  - host: webservice.gjahn-tutorials.project.ris.bht-berlin.de
     http:
       paths:
       - pathType: Prefix
