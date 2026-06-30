@@ -2,8 +2,8 @@ apiVersion: 'networking.k8s.io/v1'
 kind: 'Ingress'
 metadata:
   name: 'webservice-ingress'
-  annotations: {}
 spec:
+  ingressClassName: 'nginx'
   rules:
   - host: webservice.${PUBLIC_NODE_IP}.nip.io
     http:
