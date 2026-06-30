@@ -6,7 +6,7 @@ enableTLS: false
 
 image:
   registry: 'registry.bht-berlin.de:443'
-  repository: 'fb6-wp11-devops/webservice'
+  repository: 'fb6-wp11-devops/artifacts/webservice'
   tag: ':latest'
 
 environment: 'production'
@@ -42,6 +42,7 @@ service:
 
 
 ingress:
+  class: 'nginx'
   annotations: {}
 
 

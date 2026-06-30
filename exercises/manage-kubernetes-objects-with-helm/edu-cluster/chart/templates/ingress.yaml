@@ -15,6 +15,7 @@ spec:
         - {{ default ( printf "%s.lehre.ris.bht-berlin.de" .Release.Namespace ) .Values.fqdn }}
       secretName: '{{ default ( printf "%s-tls" (include "chart.fullname" .) ) .Values.tlsCertificateSecretName }}'
   {{- end }}
+  ingressClassName: {{ .Values.ingress.class }}
   rules:
     - host: {{ default ( printf "%s.lehre.ris.bht-berlin.de" .Release.Namespace ) .Values.fqdn }}
       http:

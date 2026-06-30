@@ -15,6 +15,7 @@ spec:
       - {{ required "ERROR: fqdn required!" .Values.fqdn }}
       secretName: '{{ default ( printf "%s-tls" (include "chart.fullname" .) ) .Values.tlsCertificateSecretName }}'
   {{- end }}
+  ingressClassName: {{ .Values.ingress.class }}
   rules:
     - host: {{ required "ERROR: fqdn required!" .Values.fqdn }}
       http:
