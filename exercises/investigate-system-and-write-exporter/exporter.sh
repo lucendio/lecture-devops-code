@@ -70,7 +70,7 @@ function getTotalUptime(){
         "# HELP traffic_inbound_total_bytes_per_second Amount of receiving traffic within a second across all network interfaces, except lo" \
         "# TYPE traffic_inbound_total_bytes_per_second gauge" \
         "traffic_inbound_total_bytes_per_second $(getTotalInboundTraffic)" \
-    > "${TMP_METRICS_WEB_DIR}/index.html"
+    > "${TMP_METRICS_WEB_DIR}/metrics"
 
     sleep 3;
 
@@ -78,12 +78,19 @@ done ) & PIDS[1]=$!
 
 
 # Start web server to serve metrics file
-( python3 -m http.server \
-    --bind 0.0.0.0 \
-    --directory "${TMP_METRICS_WEB_DIR}" \
-    "${LISTENING_PORT}"
-) & PIDS[2]=$!
+( python3 -c "
+from http.server import HTTPServer, SimpleHTTPRequestHandler
+from functools import partial
 
+class StaticHandler( SimpleHTTPRequestHandler ):
+    def guess_type( self, path ):
+        return 'text/plain; charset=utf-8'
+
+handler = partial( StaticHandler, directory = '${TMP_METRICS_WEB_DIR}' )
+
+with HTTPServer( ('0.0.0.0', ${LISTENING_PORT}) , handler ) as server:
+    server.serve_forever()
+" ) & PIDS[2]=$!
 
 
 function quit(){
