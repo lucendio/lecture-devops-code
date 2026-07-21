@@ -9,15 +9,9 @@ metadata:
     {{- toYaml . | nindent 4 }}
   {{- end }}
 spec:
-  {{- if .Values.enableTLS }}
-  tls:
-    - hosts:
-      - {{ required "ERROR: fqdn required!" .Values.fqdn }}
-      secretName: '{{ default ( printf "%s-tls" (include "chart.fullname" .) ) .Values.tlsCertificateSecretName }}'
-  {{- end }}
   ingressClassName: {{ .Values.ingress.class }}
   rules:
-    - host: {{ required "ERROR: fqdn required!" .Values.fqdn }}
+    - host: {{ default ( printf "%s.project.ris.bht-berlin.de" .Release.Namespace ) .Values.fqdn }}
       http:
         paths:
         - pathType: Prefix

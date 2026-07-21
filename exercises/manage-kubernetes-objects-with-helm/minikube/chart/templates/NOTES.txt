@@ -1,3 +1,0 @@
-{{- if .Values.ingress.enabled }}
-Open https://{{ .Values.fqdn }} in your Browser.
-{{- end }}

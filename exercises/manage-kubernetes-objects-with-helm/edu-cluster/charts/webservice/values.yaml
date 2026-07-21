@@ -1,9 +1,6 @@
 nameOverride: ""
 fullnameOverride: ""
 
-enablePersistence: false
-enableTLS: false
-
 image:
   registry: 'registry.bht-berlin.de:443'
   repository: 'fb6-wp11-devops/artifacts/webservice'
@@ -16,8 +13,6 @@ port: 3000
 
 # NOTE: may be provided via command line option
 fqdn: null
-
-envVars: {}
 
 resources:
   requests:
@@ -44,21 +39,3 @@ service:
 ingress:
   class: 'nginx'
   annotations: {}
-
-
-redis:
-  fullnameOverride: 'redis'
-  image:
-    registry: 'docker.io'
-    repository: 'bitnami/redis'
-    tag: '7.2.3'
-  architecture: 'standalone'
-  master:
-    service:
-      ports:
-        redis: 6379
-    persistence:
-      existingClaim: 'pvc-database'
-  auth:
-    enabled: true
-    usePasswordFiles: true

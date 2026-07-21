@@ -16,12 +16,6 @@ spec:
       labels:
         {{- include "chart.selectorLabels" . | nindent 8 }}
     spec:
-      {{- if .Values.enablePersistence }}
-      volumes:
-        - name: vol-db-password
-          secret:
-            secretName: '{{ include "chart.fullname" . }}-db-credentials'
-      {{- end }}
       securityContext:
         {{- toYaml .Values.securityContext | nindent 8 }}
       containers:
@@ -30,12 +24,6 @@ spec:
           {{- if .Values.image.pullPolicy }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           {{- end }}
-          {{- if .Values.enablePersistence }}
-          volumeMounts:
-            - mountPath: '/etc/db-creds'
-              name: vol-db-password
-              readOnly: true
-          {{- end }}
           env:
             - name: 'ENV_NAME'
               value: '{{ .Values.environment }}'
@@ -43,16 +31,6 @@ spec:
               value: '0.0.0.0'
             - name: 'PORT'
               value: '{{ .Values.port }}'
-        {{- if .Values.enablePersistence }}
-            - name: 'DB_HOST'
-              value: 'redis-master.{{ .Release.Namespace }}.svc'
-            - name: 'DB_PASSWORD'
-              value: '/etc/db-creds/password.txt'
-        {{- end }}
-        {{- range $key, $value := .Values.envVars }}
-            - name: {{ $key }}
-              value: {{ $value | quote }}
-        {{- end }}
           ports:
             - name: primary
               containerPort: {{ .Values.port }}
